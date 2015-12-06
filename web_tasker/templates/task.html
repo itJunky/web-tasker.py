@@ -4,8 +4,22 @@
   {% include "menu.html" %}
   <h1>Задачи для {{ user }}</h1>
   {% include "localmenu.html" %}
+  {% include "taskmenu.html" %}
   <div class="tasklist">
-    Список задач
+    <table border=1 width="100%">
+      <tr>
+        <td>№</td>
+        <td>Имя</td>
+        <td>Время</td>
+      </tr>
+      {% for task in task_list %}
+      <tr>
+        <td>{{ task[0] }}</td>
+        <td><a href="/task/view?id={{ task[0] }}">{{ task[1] }}</td>
+        <td>{{ task[2] }}</td>
+      </tr>
+      {% endfor %}
+    </table>
   </div>
   {%  include "footer.html" %}
 {% endblock %}
