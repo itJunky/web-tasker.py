@@ -5,9 +5,6 @@ from flask import Flask
 from flask_bootstrap import Bootstrap
 from flask.ext.sqlalchemy import SQLAlchemy
 
-
-sessions = {'username': 'tester'}
-user = None
 # for static files
 def create_app():
   app = Flask(__name__, static_url_path='/static/')
