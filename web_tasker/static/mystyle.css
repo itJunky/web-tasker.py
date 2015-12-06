@@ -6,7 +6,7 @@
     border: solid 2px black; 
     float: right;
     position: relative; 
-    top: 10px; 
+    top: 35px; 
     left: -70px; 
 }
 
@@ -30,14 +30,33 @@
     margin: 10px;
 }
 
-.tasklist {
-	width: auto; 
+.task-menu {
+    width: auto; 
     background: #ccc;
     padding: 5px;
     padding-right: 20px; 
     border: solid 1px black; 
     float: center;
     margin: 10px;
+}
+
+.tasklist, .taskview {
+    width: auto; 
+    background: #eee;
+    padding: 5px;
+    padding-right: 20px; 
+    border: solid 1px black; 
+    float: center;
+    margin: 10px;
+}
+
+.task_name {
+    width: 400px;
+    font-family: monospace;
+    border: 1px solid;
+    resize: auto;
+    white-space: pre-wrap;
+    word-wrap: break-word;
 }
 
 .footer {
