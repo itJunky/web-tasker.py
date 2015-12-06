@@ -1,0 +1,24 @@
+
+{% extends "head.html" %}
+{% block content %}
+  {% include "menu.html" %}
+  <h1 id="local-title">Список пользователей</h1>
+  {% include "localmenu.html" %}
+  <div class="user_list">
+    <table border="1">
+      <tr>
+        <td>Номер</td>
+        <td>Имя</td>
+        <td>Почта</td>
+      </tr>
+      {% for user in user_list %}
+      <tr>
+        <td>{{ user[0] }}</td>
+        <td>{{ user[1] }}</td>
+        <td>{{ user[2] }}</td>
+      </tr>
+      {% endfor %}
+    </table>
+  </div>
+  {% include "footer.html" %}
+{% endblock %}

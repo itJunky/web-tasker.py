@@ -1,0 +1,16 @@
+ 
+{% extends "head.html" %}
+{% block content %}
+  {% include "menu.html" %}
+  <h1>Пройдите не сложную регистрацию</h1>
+  {% include "localmenu.html" %}
+  <div class="register_form">
+	<form action="" method="post">
+	    <p>Логин:<input type=text name=username>
+	    <p>Почта:<input type=text name=email>
+	    <p>Пароль:<input type=password name=password>
+	    <p><input type=submit value=Register>
+	 </form>
+  </div>
+  {%  include "footer.html" %}
+{% endblock %}
