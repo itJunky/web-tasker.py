@@ -1,0 +1,15 @@
+
+{% extends "head.html" %}
+{% block content %}
+  {% include "menu.html" %}
+  <h1>Создание задачи для {{ user }}</h1>
+  {% include "localmenu.html" %}
+  <div class="tasklist">
+    <form action="" method="post">
+      <p>Имя<input type=text name=taskname></p>
+      <p>Текст<textarea type=text name=taskbody></textarea></p>
+      <p><input type=submit value='Отправить'></p>
+    </form>
+  </div>
+  {%  include "footer.html" %}
+{% endblock %}

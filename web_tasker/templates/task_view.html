@@ -1,0 +1,23 @@
+
+{% extends "head.html" %}
+{% block content %}
+  {% include "menu.html" %}
+  <h1>Задача {{ task_expl[0] }}</h1>
+  {% include "localmenu.html" %}
+  {% include "taskmenu.html" %} 
+  <div class="taskview">
+    <table border=1 width="100%">
+      <tr>
+      	<td>Время</td>
+        <td>Имя</td>
+        <td>Текст</td>
+      </tr>
+      <tr>
+        <td>{{ task_expl[2] }}</td>
+        <td>{{ task_expl[0] }}</td>
+        <td>{{ task_expl[1] }}</td>
+      </tr>
+    </table>
+  </div>
+  {%  include "footer.html" %}
+{% endblock %}
