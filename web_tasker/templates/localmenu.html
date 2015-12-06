@@ -1,0 +1,10 @@
+  <div class="local-menu">
+  {% if user %}
+    <a href="/profile">Профиль</a> |
+    <a href="/task">Задачи</a> |
+    <a href="/logout">Выйти</a>
+  {% else %}
+    <a href="/login">Войти</a> |
+    <a href="/register">Зарегистрироваться</a>
+  {% endif %}
+  </div>

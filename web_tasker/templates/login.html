@@ -1,0 +1,14 @@
+ 
+{% extends "head.html" %}
+{% block content %}
+  {% include "menu.html" %}
+  <h1>Войдите или присоединитесь</h1>
+  {% include "localmenu.html" %}
+  <div class="index">
+	<form action="" method="post">
+	    <p><input type=text name=username>
+	    <p><input type=submit value=Login>
+	 </form>
+  </div>
+  {%  include "footer.html" %}
+{% endblock %}

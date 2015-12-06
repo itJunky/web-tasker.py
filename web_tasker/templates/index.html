@@ -3,12 +3,9 @@
 {% block content %}
   {% include "menu.html" %}
   <h1 id="local-title">Добро пожаловать</h1>
-  <div class="local-menu">
-    <a href="/login">Войти</a> |
-    <a href="/register">Зарегистрироваться</a>
-  </div>
+  {% include "localmenu.html" %}
   <div class="index">
     После регистрации Вы сможете создать свой проект и вести в нём список и ход решения задач.
   </div>
-  {%  include "footer.html" %}
+  {% include "footer.html" %}
 {% endblock %}

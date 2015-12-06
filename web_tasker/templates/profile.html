@@ -2,7 +2,8 @@
 {% extends "head.html" %}
 {% block content %}
   {% include "menu.html" %}
-  <h1>Добро пожаловать в карточку {{ user }}</h1>
+  <h1>Личная карточка {{ user }}</h1>
+  {% include "localmenu.html" %}
   <div class="index">
     Пользователь
   </div>
