@@ -1,0 +1,68 @@
+.navbar {
+	width: 60px; 
+    background: #ddd;
+    padding: 5px;
+    padding-right: 20px; 
+    border: solid 2px black; 
+    float: right;
+    position: relative; 
+    top: 10px; 
+    left: -70px; 
+}
+
+.content {
+	width: auto; 
+    background: #bbb;
+    padding: 5px;
+    padding-right: 20px; 
+    border: solid 1px black; 
+    float: center;
+    margin: 10px;
+}
+
+.index {
+	width: auto; 
+    background: #ccc;
+    padding: 5px;
+    padding-right: 20px; 
+    border: solid 1px black; 
+    float: center;
+    margin: 10px;
+}
+
+.tasklist {
+	width: auto; 
+    background: #ccc;
+    padding: 5px;
+    padding-right: 20px; 
+    border: solid 1px black; 
+    float: center;
+    margin: 10px;
+}
+
+.footer {
+	width: auto; 
+    background: #fc0; 
+    padding: 5px; 
+    border: solid 1px black; 
+    float: right; 
+    position: relative; 
+    top: 40px; 
+    left: -70px; 
+}
+
+.local-title {
+	background: #eee;
+	margin: 100px;
+	float: right;
+}
+
+.local-menu {
+	width: auto; 
+    background: #ccc;
+    padding: 5px;
+    padding-right: 20px; 
+    border: solid 1px black; 
+    float: center;
+    margin: 10px;
+}
