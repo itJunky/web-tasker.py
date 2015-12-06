@@ -13,16 +13,18 @@ class User(db.Model):
     password = db.Column(db.String(24))
     role = db.Column(db.SmallInteger, default = ROLE_USER)
     register_date = db.Column(db.DateTime)
-    posts = db.relationship('Post', backref = 'author', lazy = 'dynamic')
+    posts = db.relationship('Task', backref = 'author', lazy = 'dynamic')
 
     def __repr__(self):
         return '<User %r>' % (self.nickname)
 
-class Post(db.Model):
+class Task(db.Model):
     id = db.Column(db.Integer, primary_key = True)
     body = db.Column(db.String(140))
+    # need more but not work
+    taskname = db.Column(db.String(140))
     timestamp = db.Column(db.DateTime)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
 
     def __repr__(self):
-        return '<Post %r>' % (self.body)
+        return '<Task %r>' % (self.body)
