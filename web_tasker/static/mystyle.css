@@ -1,5 +1,5 @@
 .navbar {
-	width: 60px; 
+	width: 110px; 
     background: #ddd;
     padding: 5px;
     padding-right: 20px; 
@@ -65,4 +65,18 @@
     border: solid 1px black; 
     float: center;
     margin: 10px;
+}
+
+.register_form, .login_form, .user_list {
+    width: 180px;
+    background: #ccc;
+    padding: 5px;
+    padding-right: 20px; 
+    border: solid 1px black; 
+    /*float: center; */
+    margin: auto;
+}
+
+h1 {
+    text-align: center;
 }
