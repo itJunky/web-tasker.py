@@ -1,0 +1,12 @@
+webtasker:
+  build: .
+  ports:
+   - "8080:8080"
+  volumes:
+   - .:/code
+  working_dir: /code
+#  links:
+#   - mysql 
+#redis:
+#  image: mysql
+  command: sh init.sh
