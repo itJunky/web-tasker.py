@@ -2,7 +2,9 @@
 {% extends "head.html" %}
 {% block content %}
   {% include "menu.html" %}
-  <h1>Задача {{ task_expl[0] }}</h1>
+  <div class="page-header">
+    <h1>Задача {{ task_expl[0] }}</h1>
+  </div>
   {% include "localmenu.html" %}
   {% include "taskmenu.html" %} 
   <div class="taskview">
