@@ -1,5 +1,10 @@
   <div class="task-menu">
     <a href='/task/create'>Создать другую задачу</a> | 
-    <a href='/task/edit'>Изменить задачу</a> | 
+    {% if task_opened %}
+	  {# если внутри задачи #}
+	  <a href='/task/edit?id={{ task_opened }}'>Изменить задачу</a> | 
+	{% else %}
+	  <a href='/task/edit'>Изменить задачу</a> | 
+	{% endif %}
     <a href='/task/delete'>Удалить задачу</a>
   </div>

@@ -41,13 +41,24 @@ def task(action='list'):
 
   elif action=='view':
     task_id = request.args.get('id')
-    cur = db.session.execute("SELECT taskname,body,timestamp FROM task WHERE id='{}'".format(task_id))
-    #return str(cur.fetchone())
-    return render_template('task_view.html', tittle='Задачи', user=user, task_expl=cur.fetchone())
+    cur = db.session.execute("SELECT id FROM user WHERE nickname='{}'".format(user))
+    try:
+      user_id = cur.fetchone()[0]
+      cur = db.session.execute("SELECT taskname,body,timestamp FROM task WHERE id='{}' AND user_id='{}'".format(task_id, user_id))
+      return render_template('task_view.html', tittle='Задачи', user=user, task_expl=cur.fetchone(), task_opened=task_id)
+    except TypeError: pass
+    return render_template('task_view.html', tittle='Задачи', user=user, task_expl=None)
 
-
-  elif action=='modify':
-    pass
+  elif action=='edit':
+    task_edited = request.args.get('id')
+    # Getting user id
+    cur = db.session.execute("SELECT id FROM user WHERE nickname='{}'".format(user))
+    try:
+      user_id = cur.fetchone()[0]
+      cur = db.session.execute("SELECT taskname,body,timestamp,status FROM task WHERE id='{}' AND user_id='{}'".format(task_edited, user_id))
+      return render_template('task_modify.html', tittle='Задачи', user=user, task_edited=task_edited, task_expl=cur.fetchone())
+    except TypeError: pass
+    return render_template('task_modify.html', tittle='Задачи', user=user, task_edited=task_edited)
 
   return render_template('task.html', tittle='Задачи', user=user)
 

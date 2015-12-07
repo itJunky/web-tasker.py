@@ -1,6 +1,4 @@
 from web_tasker import db
-#from sqlalchemy import datetime
-#from flask.ext.sqlalchemy import datetime
 import datetime
 
 ROLE_USER = 0
@@ -20,11 +18,12 @@ class User(db.Model):
 
 class Task(db.Model):
     id = db.Column(db.Integer, primary_key = True)
-    body = db.Column(db.String(140))
+    body = db.Column(db.String())
     # need more but not work
     taskname = db.Column(db.String(140))
     timestamp = db.Column(db.DateTime)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    status = db.Column(db.String(10))
 
     def __repr__(self):
         return '<Task %r>' % (self.body)
