@@ -7,22 +7,18 @@
   {% include "taskmenu.html" %} 
   <div class="taskview">
     {% if task_expl %}
+	    <form action="" method="post">
 	    <table border=1 width="100%">
-	      <tr>
-	      	<td>Время</td>
-	        <td>Имя</td>
-	        <td>Статус</td>
-	        <td>Текст</td>
-	      </tr>
-	      <tr>
-	        <td>{{ task_expl[2] }}</td>
-	        <td>{{ task_expl[0] }}</td>
-	        <td>{{ task_expl[3] }}</td>
-	        <td>{{ task_expl[1] }}</td>
-	      </tr>
+	      <input type="hidden" name="taskid" value="{{ task_edited }}" />
+	      <tr><td>Время</td><td>{{ task_expl[2] }}</td></tr>
+	      <tr><td>Название</td><td><input type='text' name="taskname" value="{{ task_expl[0] }}"></td></tr>
+	      <tr><td>Статус</td><td><input type='text' name="taskstatus" value="{{ task_expl[3] }}"></td></tr>
+	      <tr><td>Текст</td><td><textarea type='text' name="taskbody">{{ task_expl[1] }}</textarea></td></tr>
+	      <tr><td colspan=2><p><input type=submit value='Изменить'></p></td></tr>
 	    </table>
+	    </form>
     {% else %}
-    	пусто
+    	Пусто
     {% endif %}
   </div>
   {%  include "footer.html" %}

@@ -23,9 +23,11 @@ def task(action='list'):
   if action == 'list':
     if user == None:
       return render_template('task.html', tittle='Задачи', user=user)
+    # rewrite to sqlalchemy like User.query.all() or User.query.filter() like in edit section
+    # http://flask.pocoo.org/docs/0.10/patterns/sqlalchemy/
     cur = db.session.execute("SELECT id FROM user WHERE nickname='{}'".format(user))
     user_id = cur.fetchone()[0]
-    cur = db.session.execute("SELECT id, taskname, timestamp FROM task WHERE user_id='{}'".format(user_id))
+    cur = db.session.execute("SELECT id, taskname, timestamp FROM task WHERE user_id='{}' AND status!='Disabled'".format(user_id))
     tasks = cur.fetchall()
     return render_template('task.html', tittle='Задачи', user=user, task_list=tasks)
 
@@ -34,7 +36,7 @@ def task(action='list'):
       # Getting user id
       cur = db.session.execute("SELECT id FROM user WHERE nickname='{}'".format(user))
       user_id = cur.fetchone()[0]
-      task_row = models.Task(user_id=user_id, taskname=request.form['taskname'], body=request.form['taskbody'], timestamp=datetime.datetime.now())
+      task_row = models.Task(user_id=user_id, taskname=request.form['taskname'], body=request.form['taskbody'], timestamp=datetime.datetime.now(), status='Active')
       db.session.add(task_row)
       db.session.commit()
     return render_template('task_create.html', tittle='Задачи', user=user)
@@ -42,23 +44,32 @@ def task(action='list'):
   elif action=='view':
     task_id = request.args.get('id')
     cur = db.session.execute("SELECT id FROM user WHERE nickname='{}'".format(user))
-    try:
+    try: # if logined
       user_id = cur.fetchone()[0]
       cur = db.session.execute("SELECT taskname,body,timestamp FROM task WHERE id='{}' AND user_id='{}'".format(task_id, user_id))
       return render_template('task_view.html', tittle='Задачи', user=user, task_expl=cur.fetchone(), task_opened=task_id)
-    except TypeError: pass
+    except TypeError: return redirect(url_for('login')) # if not logined go to login
     return render_template('task_view.html', tittle='Задачи', user=user, task_expl=None)
 
   elif action=='edit':
-    task_edited = request.args.get('id')
-    # Getting user id
-    cur = db.session.execute("SELECT id FROM user WHERE nickname='{}'".format(user))
-    try:
-      user_id = cur.fetchone()[0]
-      cur = db.session.execute("SELECT taskname,body,timestamp,status FROM task WHERE id='{}' AND user_id='{}'".format(task_edited, user_id))
-      return render_template('task_modify.html', tittle='Задачи', user=user, task_edited=task_edited, task_expl=cur.fetchone())
-    except TypeError: pass
-    return render_template('task_modify.html', tittle='Задачи', user=user, task_edited=task_edited)
+    if request.method == 'POST':
+      try:
+        cur = db.session.execute("SELECT id FROM user WHERE nickname='{}'".format(user))
+        user_id = cur.fetchone()[0]
+        db.session.query(models.Task).filter_by(id=request.form['taskid']).update({'taskname':request.form['taskname'], 'status':request.form['taskstatus'], 'body':request.form['taskbody']})
+        db.session.commit()
+        return redirect(url_for('task'))
+      except TypeError: return redirect(url_for('login'))
+    else:
+      task_edited = request.args.get('id')
+      # Getting user id
+      cur = db.session.execute("SELECT id FROM user WHERE nickname='{}'".format(user))
+      try:
+        user_id = cur.fetchone()[0]
+        cur = db.session.execute("SELECT taskname,body,timestamp,status FROM task WHERE id='{}' AND user_id='{}'".format(task_edited, user_id))
+        return render_template('task_modify.html', tittle='Задачи', user=user, task_edited=task_edited, task_expl=cur.fetchone())
+      except TypeError: pass
+      return render_template('task_modify.html', tittle='Задачи', user=user, task_edited=task_edited)
 
   return render_template('task.html', tittle='Задачи', user=user)
 
