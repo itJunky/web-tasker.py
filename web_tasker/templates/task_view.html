@@ -6,17 +6,10 @@
   {% include "localmenu.html" %}
   {% include "taskmenu.html" %} 
   <div class="taskview">
-    <table border=1 width="100%">
-      <tr>
-      	<td>Время</td>
-        <td>Имя</td>
-        <td>Текст</td>
-      </tr>
-      <tr>
-        <td>{{ task_expl[2] }}</td>
-        <td>{{ task_expl[0] }}</td>
-        <td>{{ task_expl[1] }}</td>
-      </tr>
+    <table class="table">
+      <tr><td>Время</td><td>{{ task_expl[2] }}</td></tr>
+      <tr><td>Имя</td><td>{{ task_expl[0] }}</td></tr>
+      <tr><td>Текст</td><td>{{ task_expl[1] }}</td></tr>
     </table>
   </div>
   {%  include "footer.html" %}

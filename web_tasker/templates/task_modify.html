@@ -8,7 +8,7 @@
   <div class="taskview">
     {% if task_expl %}
 	    <form action="" method="post">
-	    <table border=1 width="100%">
+	    <table class="table">
 	      <input type="hidden" name="taskid" value="{{ task_edited }}" />
 	      <tr><td>Время</td><td>{{ task_expl[2] }}</td></tr>
 	      <tr><td>Название</td><td><input type='text' name="taskname" value="{{ task_expl[0] }}"></td></tr>
