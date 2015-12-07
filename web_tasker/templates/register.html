@@ -6,12 +6,18 @@
   	<h1>Пройдите не сложную регистрацию</h1>
   </div>
   {% include "localmenu.html" %}
-  <div class="register_form">
-	<form action="" method="post">
-	    <p>Логин:<input type=text name=username>
-	    <p>Почта:<input type=text name=email>
-	    <p>Пароль:<input type=password name=password></p>
-	    <input class="btn btn-primary btn-block" type=submit value=Register>
+  <div class="container well-lg register_form">
+	<form role="form" action="" method="post">
+	    <label for="login">Логин:</label><input class="form-control well-sm" type="text" name="username">
+	    <div class="form-group">
+        <label for="email">Почта:</label>
+        <input type="email" class="form-control well-sm" id="email">
+      </div>
+	    <div class="form-group">
+        <label for="pwd">Пароль:</label>
+        <input class="form-control well-sm" type="password" name="password" id="pwd">
+      </div>
+	    <input class="btn btn-primary btn-block" type="submit" value="Зарегистриовать">
 	 </form>
   </div>
   {%  include "footer.html" %}

@@ -40,14 +40,14 @@
     margin: 10px;
 }
 
-.tasklist, .taskview {
-    width: auto; 
-    background: #eee;
-    padding: 5px;
-    padding-right: 20px; 
-    border: solid 1px black; 
-    float: center;
-    margin: 10px;
+.tasklist {
+    margin-top: -20px;
+    margin-bottom: -20px;
+}
+
+ .taskview {
+    margin-left: 80%;
+    margin-right: 80%;
 }
 
 .task_name {
@@ -85,8 +85,11 @@
     float: center;
     margin: 10px;
 }
-
-.register_form, .login_form, .user_list {
+.register_form, .login_form {
+    width: 20%;
+    background: #ccc;
+}
+.user_list {
     width: 180px;
     background: #ccc;
     padding: 5px;
