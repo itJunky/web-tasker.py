@@ -2,14 +2,16 @@
 {% extends "head.html" %}
 {% block content %}
   {% include "menu.html" %}
-  <h1>Пройдите не сложную регистрацию</h1>
+  <div class="page-header">
+  	<h1>Пройдите не сложную регистрацию</h1>
+  </div>
   {% include "localmenu.html" %}
   <div class="register_form">
 	<form action="" method="post">
 	    <p>Логин:<input type=text name=username>
 	    <p>Почта:<input type=text name=email>
-	    <p>Пароль:<input type=password name=password>
-	    <p><input type=submit value=Register>
+	    <p>Пароль:<input type=password name=password></p>
+	    <input class="btn btn-primary btn-block" type=submit value=Register>
 	 </form>
   </div>
   {%  include "footer.html" %}
