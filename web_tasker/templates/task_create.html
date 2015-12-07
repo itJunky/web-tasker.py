@@ -8,9 +8,11 @@
   {% include "localmenu.html" %}
   <div class="tasklist">
     <form action="" method="post">
-      <p>Имя<input required type=text name=taskname></p>
-      <p>Текст<textarea required type=text name=taskbody></textarea></p>
-      <p><input type=submit value='Отправить'></p>
+    <table class="table">
+      <tr><td>Имя</td><td><input required type=text name=taskname></td></tr>
+      <tr><td>Текст</td><td><textarea required type=text name=taskbody></textarea></td></tr>
+      <tr><td colspan="2"><input class="btn btn-primary btn-block" type=submit value='Отправить'></td></tr>
+    </table>
     </form>
   </div>
   {%  include "footer.html" %}

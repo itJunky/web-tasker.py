@@ -7,18 +7,18 @@
   </div>
   {% include "localmenu.html" %}
   {% include "taskmenu.html" %}
-  <div class="container">
+  <div class="panel-group" style="margin-left: 50px; margin-right: 50px">
     <table class="table">
       <tr>
-        <td>№</td>
-        <td>Имя</td>
-        <td>Время</td>
-      </tr>
+        <td><div class="panel-heading">№</div></td>
+        <td><div class="panel-heading">Имя</div></td>
+        <td><div class="panel-heading">Время</div></td>
+      </div>
       {% for task in task_list %}
       <tr>
-        <td>{{ task[0] }}</td>
-        <td><a href="/task/view?id={{ task[0] }}">{{ task[1] }}</td>
-        <td>{{ task[2] }}</td>
+        <td><div class="panel-body">{{ task[0] }}</div></td>
+        <td><div class="panel-body"><a href="/task/view?id={{ task[0] }}">{{ task[1] }}</a></td>
+        <td><div class="panel-body">{{ task[2] }}</div></td>
       </tr>
       {% endfor %}
     </table>
