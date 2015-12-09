@@ -1,10 +1,17 @@
-  <div class="task-menu well-lg">
-    <a href='/task/create'>Создать другую задачу</a> | 
-    {% if task_opened %}
-	  {# если внутри задачи #}
-	  <a href='/task/edit?id={{ task_opened }}'>Изменить задачу</a> | 
-	{% else %}
-	  <a href='/task/edit'>Изменить задачу</a> | 
-	{% endif %}
-    <a href='/task/delete'>Удалить задачу</a>
+<nav class="navbar taskmenu">  
+  <div class="container-fluid ">
+  	<div class="navbar-header">
+      <label class="navbar-brand">Список</label>
+    </div>
+    <ul class="nav navbar-nav ">
+	    <li><a href='/task/create'>Создать другую задачу</a></li>
+		  {% if task_opened %}
+			  {# если внутри задачи #}
+			  <li><a href='/task/edit?id={{ task_opened }}'>Изменить задачу</a></li>
+			{% else %}
+			  <li><a href='/task/edit'>Изменить задачу</a></li>
+			{% endif %}
+		  <li><a href='/task/delete'>Удалить задачу</a></li>
+	  </ul>
   </div>
+</nav>

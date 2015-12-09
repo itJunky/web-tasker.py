@@ -1,5 +1,5 @@
-.navbar {
-	width: 110px; 
+.mainmenu {
+    width: 110px; 
     background: #ddd;
     padding: 5px;
     padding-right: 20px; 
@@ -30,14 +30,19 @@
     margin: 10px;
 }
 
-.task-menu {
-    width: auto; 
+.localmenu {
+    width: 98%;
+    left: 1%;
+    padding: 0px;
+    margin-top: -10px;
+}
+
+.taskmenu {
+    width: 98%; 
+    height: 10px;
     background: #ccc;
-    padding: 5px;
-    padding-right: 20px; 
-    border: solid 1px black; 
-    float: center;
-    margin: 10px;
+    left: 1%;
+    margin-top: -10px;
 }
 
 .tasklist {
@@ -77,13 +82,14 @@
 }
 
 .local-menu {
-	width: auto; 
+	width: 80%; 
     background: #ccd;
-    padding: 5px;
+    margin-top: -5%;
+   /* padding: 5px;
     padding-right: 20px; 
     border: solid 1px black; 
     float: center;
-    margin: 10px;
+    margin: 10px; */
 }
 .register_form, .login_form {
     width: 20%;

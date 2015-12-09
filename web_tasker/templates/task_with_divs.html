@@ -1,0 +1,25 @@
+
+{% extends "head.html" %}
+{% block content %}
+  {% include "menu.html" %}
+  <div class="page-header">
+    <h1>Задачи для {{ user }}</h1>
+  </div>
+  {% include "localmenu.html" %}
+  {% include "taskmenu.html" %}
+  <div class="container panel-group" style="margin-left: 50px; margin-right: 50px">
+    <div class="table row">
+      <div class="col-md-4 panel-heading">№</div>
+      <div class="col-md-4 panel-heading">Имя</div>
+      <div class="col-md-4 panel-heading">Время</div>
+    </div>
+    {% for task in task_list %}
+      <div class="row">
+        <div class="col-md-4 panel-body tasklist">{{ task[0] }}</div>
+        <div class="col-md-4 panel-body tasklist"><a href="/task/view?id={{ task[0] }}">{{ task[1] }}</a>
+        <div class="col-md-4 panel-body tasklist">{{ task[2] }}</div>
+      </div>
+    {% endfor %}
+  </div>
+  {%  include "footer.html" %}
+{% endblock %}

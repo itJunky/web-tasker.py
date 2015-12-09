@@ -7,11 +7,11 @@
   </div>
   {% include "localmenu.html" %}
   {% include "taskmenu.html" %} 
-  <div class="taskview well-lg">
+  <div class="well-lg">
     <table class="table">
       <tr><td>Время</td><td>{{ task_expl[2] }}</td></tr>
-      <tr><td>Имя</td><td>{{ task_expl[0] }}</td></tr>
-      <tr><td>Текст</td><td>{{ task_expl[1] }}</td></tr>
+      <tr><td>Имя</td><td><div class="well well-sm">{{ task_expl[0] }}</td></td></tr>
+      <tr><td>Текст</td><td><div class="well well-lg">{{ task_expl[1] }}</div></td></tr>
     </table>
   </div>
   {%  include "footer.html" %}

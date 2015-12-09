@@ -1,10 +1,19 @@
-  <div class="local-menu well-lg">
-  {% if user %}
-    <a href="/profile">Профиль</a> |
-    <a href="/task">Задачи</a> |
-    <a href="/logout">Выйти</a>
-  {% else %}
-    <a href="/login">Войти</a> |
-    <a href="/register">Зарегистрироваться</a>
-  {% endif %}
+<nav class="navbar navbar-inverse localmenu">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <a class="navbar-brand" href="/">Задачник</a>
+    </div>
+    <div>
+      <ul class="nav navbar-nav ">
+        {% if user %}
+          <li class="active"><a href="/profile">Профиль</a></li> 
+          <li><a href="/task">Задачи</a></li>
+          <li><a href="/logout">Выйти</a></li>
+        {% else %}
+          <li><a href="/login">Войти</a></li>
+          <li><a href="/register">Зарегистрироваться</a></li>
+        {% endif %}
+      </ul>
+    </div>
   </div>
+</nav>
