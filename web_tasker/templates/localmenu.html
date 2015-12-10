@@ -4,10 +4,14 @@
       <a class="navbar-brand" href="/">Задачник</a>
     </div>
     <div>
-      <ul class="nav navbar-nav ">
+      <ul class="nav navbar-nav">
         {% if user %}
-          <li class="active"><a href="/profile">Профиль</a></li> 
-          <li><a href="/task">Задачи</a></li>
+          <li {%- if request.path == "/profile" %} class="active" {% endif %}>
+	    <a href="/profile">Профиль</a>
+	  </li>
+          <li {%- if request.path == "/task" %} class="active" {% endif %}>
+	    <a href="/task">Задачи</a>
+	  </li>
           <li><a href="/logout">Выйти</a></li>
         {% else %}
           <li><a href="/login">Войти</a></li>
