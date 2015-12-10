@@ -39,6 +39,7 @@ def task(action='list'):
       task_row = models.Task(user_id=user_id, taskname=request.form['taskname'], body=request.form['taskbody'], timestamp=datetime.datetime.now(), status='Active')
       db.session.add(task_row)
       db.session.commit()
+      return redirect(url_for('task'))
     return render_template('task_create.html', tittle='Задачи', user=user)
 
   elif action=='view':
@@ -110,7 +111,10 @@ def logout():
 @app.route("/register", methods=['GET', 'POST'])
 def register_user():
   if request.method == 'POST':
-    user_row = models.User(nickname=request.form['username'], email=request.form['email'], password=request.form['password'], role=models.ROLE_USER, register_date=datetime.datetime.now())
+    user_row = models.User(nickname=request.form.get('username'),
+			      email=request.form.get('email'), 
+                           password=request.form.get('password'),
+                           role=models.ROLE_USER, register_date=datetime.datetime.now())
     db.session.add(user_row)
     db.session.commit()
     return redirect(url_for('index'))
