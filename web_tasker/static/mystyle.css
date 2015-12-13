@@ -1,31 +1,32 @@
 .mainmenu {
-    width: 110px; 
+    width: 110px;
     background: #ddd;
     padding: 5px;
-    padding-right: 20px; 
-    border: solid 2px black; 
+    padding-right: 20px;
+    border: solid 2px black;
     float: right;
-    position: relative; 
-    top: 35px; 
-    left: -70px; 
+    position: relative;
+    top: -100px;
+    left: -70px;
 }
 
-.content {
-    width: auto; 
+.mycontent {
+    /*width: auto;
     background: #bbb;
     padding: 5px;
     padding-right: 20px; 
-    border: solid 1px black; 
     float: center;
-    margin: 10px;
+    margin: 10px;*/
+    border: solid 1px black;
+    min-height: 20%;
 }
 
 .index {
-    width: 80%; 
+    width: 60%;
     background: #ccc;
     left: 10%;
     height: 10px;
-    margin-top: 18%; 
+    margin-top: 18%;
 }
 
 .localmenu {
@@ -36,7 +37,7 @@
 }
 
 .taskmenu {
-    width: 98%; 
+    width: 98%;
     height: 10px;
     background: #ccc;
     left: 1%;
@@ -44,6 +45,11 @@
 }
 
 .tasklist {
+    width: 94%;
+    margin-left: 4%;
+}
+
+.tasklistelement {
     margin-top: -20px;
     margin-bottom: -20px;
 }
@@ -62,16 +68,18 @@
     word-wrap: break-word;
 }
 
-.footer {
+#footer {
     width: auto; 
     background: #fc0; 
-    padding: 5px; 
-    border: solid 1px black; 
-    float: right; 
-    position: relative; 
+    clear: both;
+    padding: 5px;
+    border: solid 1px black;
+    float: right;
+    position: relative;
     /*top: 40px; */
-    left: -70px; 
-    margin-top: 35%;
+    left: -70px;
+    /*margin-top: -3em; */
+    z-index: 20;
 }
 
 .local-title {
@@ -81,7 +89,7 @@
 }
 
 .local-menu {
-    width: 80%; 
+    width: 80%;
     background: #ccd;
     margin-top: -5%;
     float: center;
@@ -95,13 +103,17 @@
     background: #ccc;
 }
 .user_list {
-    width: 180px;
+    width: 250px;
     background: #ccc;
     padding: 5px;
-    padding-right: 20px; 
-    border: solid 1px black; 
+    padding-right: 20px;
+    border: solid 1px black;
     /*float: center; */
     margin: auto;
+}
+
+.container-fluid {
+    height: 50px;
 }
 
 h1 {

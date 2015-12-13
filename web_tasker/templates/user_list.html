@@ -1,11 +1,13 @@
 
-{% extends "head.html" %}
-{% block content %}
-  {% include "menu.html" %}
-  <div class="page-header">
-    <h1 id="local-title">Список пользователей</h1>
-  </div>
-  {% include "localmenu.html" %}
+    {% extends "head.html" %}
+    {% block content %}
+
+    <div class="page-header">
+      <h1 id="local-title">Список пользователей</h1>
+    </div>
+    {% include "localmenu.html" %}
+    {% include "menu.html" %}
+  </div> {# id="header" #}
   <div class="user_list">
     <table class="table-bordered">
       <tr>
@@ -21,6 +23,7 @@
       </tr>
       {% endfor %}
     </table>
-  </div>
+  </div> {# id="content" #}
   {% include "footer.html" %}
+</div> {# id="wrapper" #}
 {% endblock %}

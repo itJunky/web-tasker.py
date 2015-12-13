@@ -1,14 +1,20 @@
 
-{% extends "head.html" %}
-{% block content %}
-  {% include "menu.html" %}
-  <div class="page-header">
-    <h1>Задачи для {{ user }}</h1>
-  </div>
-  {% include "localmenu.html" %}
-  {% include "taskmenu.html" %}
-  <div class="container panel-group">
-    <table class="table table-striped table-hover table-condense">
+    {% extends "head.html" %}
+    {% block content %}
+  
+    <div class="page-header">
+      {% if task_status == True %}
+        <h1>Задачи для {{ user }}</h1>
+      {% else %}
+        <h1>Выполненные задачи для {{ user }}</h1>
+      {% endif %}
+    </div>
+    {% include "localmenu.html" %}
+    {% include "menu.html" %}
+    {% include "taskmenu.html" %}
+  </div> {# id="header" #}
+  <div id='content' class="container panel-group">
+    <table class="tasklist table table-striped table-hover table-condense">
       <tr>
         <td><div class="panel-heading"><strong>№</strong></div></td>
         <td><div class="panel-heading"><strong>Имя</strong></div></td>
@@ -16,12 +22,13 @@
       </div>
       {% for task in task_list %}
       <tr>
-        <td><div class="tasklist panel-body">{{ task[0] }}</div></td>
-        <td><div class="tasklist panel-body"><a href="/task/view?id={{ task[0] }}">{{ task[1] }}</a></td>
-        <td><div class="tasklist panel-body jumbotron">{{ task[2] }}</div></td>
+        <td><div class="tasklistelement panel-body">{{ task[0] }}</div></td>
+        <td><div class="tasklistelement panel-body"><a href="/task/view?id={{ task[0] }}">{{ task[1] }}</a></td>
+        <td><div class="tasklistelement panel-body jumbotron">{{ task[2] }}</div></td>
       </tr>
       {% endfor %}
     </table>
   </div>
   {%  include "footer.html" %}
+</div> {# id="wrapper" #}
 {% endblock %}
