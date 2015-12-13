@@ -10,6 +10,7 @@ class User(db.Model):
     email = db.Column(db.String(64), index = True, unique = True)
     p_hash = db.Column(db.String(96))
     password = db.Column(db.String(24))
+    cookie = db.Column(db.String(8))
     role = db.Column(db.SmallInteger, default = ROLE_USER)
     register_date = db.Column(db.DateTime)
     posts = db.relationship('Task', backref = 'author', lazy = 'dynamic')

@@ -20,10 +20,11 @@ def index():
 def task(action='list'):
   #app.logger.info('Task begin '+str(check_user())) # debug
   if not logined_by_cookie():
-    return redirect(url_for('login')) # if not logined go to login
+    app.logger.info('Not logined') # debug
+    return redirect(url_for('do_login')) # if not logined go to login
   else:
     user_id = check_user()
-  #app.logger.info('Task logined user:\t'+str(user_id)) # debug
+  app.logger.info('Task logined user:\t'+str(user_id)) # debug
 
   ### Showing task list
   if action == 'list' or action == 'list_closed':
@@ -60,7 +61,7 @@ def task(action='list'):
       user_id = cur.fetchone()[0]
       cur = db.session.execute("SELECT taskname,body,timestamp FROM task WHERE id='{}' AND user_id='{}'".format(task_id, user_id))
       return render_template('task_view.html', tittle='Задачи', user=get_nick(), task_expl=cur.fetchone(), task_opened=task_id)
-    except TypeError: return redirect(url_for('login')) # if not logined go to login
+    except TypeError: return redirect(url_for('do_login')) # if not logined go to login
     return render_template('task_view.html', tittle='Задачи', user=get_nick(), task_expl=None)
 
   ### Edit task
@@ -72,7 +73,7 @@ def task(action='list'):
         db.session.query(models.Task).filter_by(id=request.form['taskid']).update({'taskname':request.form['taskname'], 'status':request.form['taskstatus'], 'body':request.form['taskbody']})
         db.session.commit()
         return redirect(url_for('task'))
-      except TypeError: return redirect(url_for('login'))
+      except TypeError: return redirect(url_for('do_login'))
     else:
       task_edited = request.args.get('id')
       # Getting user id
@@ -90,7 +91,7 @@ def task(action='list'):
 def profile():
 
   if not logined_by_cookie():
-    return redirect(url_for('login')) # if not logined go to login
+    return redirect(url_for('do_login')) # if not logined go to login
   else:
     return render_template('profile.html', user=get_nick())
     
@@ -99,34 +100,27 @@ def about():
     return render_template('about.html', tittle='О сайте')
 
 @app.route("/login", methods=['GET', 'POST'])
-def login():
-  # need refactor
+def do_login():
   if request.method == 'POST':
-          
     user = str(request.form['username'])
     password = str(request.form['password'])
     
-    if user and password:
-      cur = db.session.execute("select id from user where nickname='{0}' and password='{1}'".format(user, password))
-      user_id = int(cur.fetchone()[0])
-      #app.logger.info(user_id) # debug
-      
-    else:
-      return 'Try again'
-
-    #if check_password:
-    if user_id:
+    #app.logger.info('Check password:\t'+str(check_passwd(user, password))) # debug
+    if check_passwd(user, password):
       # Set Cookies for knowing about user on other pages
-      app.logger.info('Set cookies') # debug
-      ### refactoring
-      redirect_to_index = redirect(url_for('task'))
-      response = app.make_response(redirect_to_index)
+      auth_hash = str(id_generator())
+      user_id = int(get_user_id_from_db(user))
+      app.logger.info('Set cookies '+str(user)+' '+str(user_id)+' '+auth_hash) # debug
       
-      #app.logger.info(response.headers) # debug
-      #response.set_cookie('hash', str(auth_hash))
+      response = app.make_response(redirect(url_for('task')))
       response.set_cookie('id', value=str(user_id))
-      response.set_cookie('pass', value=str(password))
+      response.set_cookie('hash', value=auth_hash)
       response.set_cookie('logged_at', value=str(datetime.now()))
+      db.session.query(models.User).filter_by(id=user_id).update({'cookie':auth_hash})
+      db.session.commit()
+      #sql = "UPDATE user SET cookie='{}' WHERE id='{}'".format(auth_hash, user_id)
+      #app.logger.info('SQL:\t'+str(sql)) # debug
+      #db.session.execute(sql)
       return response # need for set cookies finaly
     else:
       return 'login wrong'
@@ -165,7 +159,7 @@ def register_user():
 @app.route("/users")
 def users_list():
   if not logined_by_cookie():
-    return redirect(url_for('login')) # if not logined go to login
+    return redirect(url_for('do_login')) # if not logined go to login
   else:
     user_id = check_user()
 
@@ -176,41 +170,42 @@ def users_list():
 #############################################
 
 def check_user():
-  app.logger.info('Logined by cookies:\t'+str(logined_by_cookie())) # debug
   if logined_by_cookie():
     # refactoring
+    app.logger.info('Logined by cookies:\t'+str(request.cookies.get('id'))) # debug
     return request.cookies.get('id')
   else:
     return None
 
+def get_user_id_from_db(username):
+    cur = db.session.execute("SELECT id FROM user WHERE nickname='{0}'".format(str(username)))
+    return cur.fetchone()[0]
+
 def check_passwd(login, password):
-  p_hash = get_hash(login)[0]
-  if p_hash: # exist
-    salt_end = p_hash.rindex('$')
-    salt = p_hash[:salt_end]
+  db_hash = get_hash_from_db(login)[0]
+  if db_hash: # exist
+    salt_end = db_hash.rindex('$')
+    salt = db_hash[:salt_end]
     import crypt;
     crypted_pass_hash = crypt.crypt(password, salt)
-    if crypted_pass_hash == p_hash:
-      return 1
+    if crypted_pass_hash == db_hash:
+      return 1 # Passwords equal
     else:
-      #print("Login Failed: "+login, password)
-      return 0
+      return 0 # Not equal
   else:
-    #print("No user found: "+login)
-    return 0
+    return 0 # p_hash doesn't exist
 
 def logined_by_cookie():
   user_id = str(request.cookies.get('id'))
-  #user_hash = request.cookies.get('hash')
-  user_pass = str(request.cookies.get('pass'))
-  #app.logger.info('UserID from cookie:\t'+user_id) # debug
+  user_hash = request.cookies.get('hash')
+  app.logger.info('UserID from cookie:\t'+user_id+' '+user_hash) # debug
 
   if not user_id == str('None'): # if user_id exist
-    cur = db.session.execute("select id from user where id='{0}' and password='{1}'".format(user_id, user_pass))
-    cookie = cur.fetchone()[0]
-    #app.logger.info('UserID from db:\t\t'+str(cookie)) # debug
+    cur = db.session.execute("SELECT cookie FROM user WHERE id='{0}'".format(user_id))
+    cookie = cur.fetchone()[0] # getting hash
+    app.logger.info('Cookie from db:\t\t'+str(cookie)) # debug
     
-    if int(cookie) == int(user_id):
+    if str(cookie) == str(user_hash):
       return True # yeah LOGINED
     
   return False
@@ -223,6 +218,11 @@ def get_nick():
 
   return None
 
-def get_hash(username):
+def get_hash_from_db(username):
   cur = db.session.execute("SELECT p_hash FROM user WHERE nickname='{0}'".format(username))
   return cur.fetchone()
+
+import string
+def id_generator(size=8, chars=string.ascii_uppercase + string.digits):
+    import random
+    return ''.join(random.choice(chars) for _ in range(size))
