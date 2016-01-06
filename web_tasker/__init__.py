@@ -17,7 +17,5 @@ app.config.from_object('config_db')
 db = SQLAlchemy(app)
 from web_tasker import views, models
 
-import web_tasker.views
-
 # set the secret key.  keep this really secret:
 app.secret_key = 'A0Zr98j/3yX R~XHH!jmN]LWX/,?RT'
