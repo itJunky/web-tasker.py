@@ -3,7 +3,7 @@
     {% block content %}
 
     <div class="page-header">
-      <h1>Задача {{ task_expl[0] }}</h1>
+      <h1>Задача: {{ task_expl[0] }}</h1>
     </div>
     {% include "localmenu.html" %}
     {% include "menu.html" %}
@@ -12,9 +12,42 @@
   <div id='content' class="container">
     <table class="tasklist table">
       <tr><td>Время</td><td>{{ task_expl[2] }}</td></tr>
-      <tr><td>Имя</td><td><div class="well well-sm">{{ task_expl[0] }}</td></td></tr>
-      <tr><td>Текст</td><td><div class="well well-lg">{{ task_expl[1] }}</div></td></tr>
+      <tr><td>Имя</td><td><div class="well well-sm">{{ task_expl[0] }}</div></td></td></tr>
+      <tr><td>Текст</td><td><pre class="well-lg">{{ task_expl[1] }}</pre></td></tr>
     </table>
+    <div class="comments-section">
+      <hr class="style-one"> {# comments section #}
+      <p align="center">Коменты</p><br>
+      {% for comment in comments %}
+        <table class="tasklist table">
+          <tr><td>Время</td><td>{{ comment[2] }}</td></tr>
+          <tr><td>Имя</td><td>{{ comment[4] }}</td></td></tr>
+          <tr><td>Текст</td><td><pre class="well-lg">{{ comment[3] }}</pre></td></tr>
+        </table>
+      {% endfor %}
+      <hr class="style-two"> {# form section #}
+    </div>
+    <form action="/comment_to_task" method="post"><div class="form-group">
+      <table class="tasklist table">
+        <input type="hidden" name="taskid" value="{{ task_opened }}" />
+        <tr class="well">
+          <td colspan=2>
+            <p align="center"><b>Комментировать</b></p>
+          </td>
+        </tr>
+        <tr>
+          <td width="7%">Текст</td>
+          <td>
+            <textarea class="form-control well-lg" type='text' name="commenttext">Коммент</textarea>
+          </td>
+        </tr>
+        <tr>
+          <td colspan=2>
+            <input class="btn btn-primary btn-block" type='submit' value='Добавть Комментарий'>
+          </td>
+        </tr>
+      </table>
+    </div></form>
   </div>
   {%  include "footer.html" %}
 </div> {# id="wrapper" #}

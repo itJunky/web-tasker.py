@@ -21,7 +21,6 @@ class User(db.Model):
 class Task(db.Model):
     id = db.Column(db.Integer, primary_key = True)
     body = db.Column(db.String())
-    # need more but not work
     taskname = db.Column(db.String(140))
     timestamp = db.Column(db.DateTime)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
@@ -29,3 +28,13 @@ class Task(db.Model):
 
     def __repr__(self):
         return '<Task %r>' % (self.body)
+
+class Comments(db.Model):
+    id = db.Column(db.Integer, primary_key = True)
+    user_id = db.Column(db.Integer)
+    task_id = db.Column(db.Integer)
+    timestamp = db.Column(db.DateTime)
+    text = db.Column(db.String())
+
+    def __repr__(self):
+        return '<Comment %r>' % (self.text)

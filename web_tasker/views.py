@@ -3,6 +3,8 @@ from web_tasker import app, db, models
 from flask import Flask, render_template, request, send_from_directory, request, make_response, session, redirect, url_for
 from datetime import datetime
 
+import logging
+
 @app.route("/")
 def index():
   # getting referer
@@ -55,20 +57,31 @@ def task(action='list'):
 
   ### Explain task 
   elif action=='view':
+    app.logger.info('### Start viewing ###')
     task_id = request.args.get('id')
-    cur = db.session.execute("SELECT id FROM user WHERE nickname='{}'".format(get_nick()))
+    nickname = get_nick()
+    cur = db.session.execute("SELECT id FROM user WHERE nickname='{}'".format(nickname))
     try: # if logined
       user_id = cur.fetchone()[0]
-      cur = db.session.execute("SELECT taskname,body,timestamp FROM task WHERE id='{}' AND user_id='{}'".format(task_id, user_id))
-      return render_template('task_view.html', tittle='Задачи', user=get_nick(), task_expl=cur.fetchone(), task_opened=task_id)
-    except TypeError: return redirect(url_for('do_login')) # if not logined go to login
-    return render_template('task_view.html', tittle='Задачи', user=get_nick(), task_expl=None)
+      task_explained = db.session.execute("SELECT taskname,body,timestamp FROM task WHERE id='{}' AND user_id='{}'".format(task_id, user_id))
+      all_comments = db.session.execute("SELECT c.id,c.user_id,c.timestamp,c.text,u.nickname FROM comments c, user u WHERE c.task_id='{}' and c.user_id=u.id".format(task_id))
+      #all_comments = db.session.query(models.Comments).filter_by(task_id=task_id).all()
+      app.logger.info('### End viewing ###')
+      # may be need redirect to internal func here
+      return render_template('task_view.html', tittle='Задачи', user=nickname,
+                              task_expl=task_explained.fetchone(), task_opened=task_id,
+                              comments=all_comments.fetchall())
+    except TypeError: # if not logined go to login
+      return redirect(url_for('do_login'))
+    else:
+      return 'Unresolved error'
 
   ### Edit task
   elif action=='edit':
+    nickname = get_nick()
     if request.method == 'POST':
       try:
-        cur = db.session.execute("SELECT id FROM user WHERE nickname='{}'".format(get_nick()))
+        cur = db.session.execute("SELECT id FROM user WHERE nickname='{}'".format(nickname))
         user_id = cur.fetchone()[0]
         db.session.query(models.Task).filter_by(id=request.form['taskid']).update({'taskname':request.form['taskname'], 'status':request.form['taskstatus'], 'body':request.form['taskbody']})
         db.session.commit()
@@ -77,19 +90,27 @@ def task(action='list'):
     else:
       task_edited = request.args.get('id')
       # Getting user id
-      cur = db.session.execute("SELECT id FROM user WHERE nickname='{}'".format(get_nick()))
+      cur = db.session.execute("SELECT id FROM user WHERE nickname='{}'".format(nickname))
       try:
         user_id = cur.fetchone()[0]
         cur = db.session.execute("SELECT taskname,body,timestamp,status FROM task WHERE id='{}' AND user_id='{}'".format(task_edited, user_id))
-        return render_template('task_modify.html', tittle='Задачи', user=get_nick(), task_edited=task_edited, task_expl=cur.fetchone())
+        return render_template('task_modify.html', tittle='Задачи', user=nickname, task_edited=task_edited, task_expl=cur.fetchone())
       except TypeError: pass
-      return render_template('task_modify.html', tittle='Задачи', user=get_nick(), task_edited=task_edited)
+      return render_template('task_modify.html', tittle='Задачи', user=nickname, task_edited=task_edited)
 
-  return render_template('task.html', tittle='Задачи', user=get_nick())
+  return 'Unresolved error 2'
+  #return render_template('task.html', tittle='Задачи', user=nickname)
+
+@app.route("/comment_to_task", methods=['POST'])
+def post_comment_to_task():
+  app.logger.info('### Post Comment to db ###') # debug
+  new_comment = models.Comments(user_id=check_user(), task_id=request.form['taskid'], timestamp=datetime.now(), text=request.form.get('commenttext'))
+  db.session.add(new_comment)
+  db.session.commit()
+  return redirect(url_for('task', action='view', id=int(request.form['taskid'])))
 
 @app.route("/profile")
 def profile():
-
   if not logined_by_cookie():
     return redirect(url_for('do_login')) # if not logined go to login
   else:
@@ -172,8 +193,9 @@ def users_list():
 def check_user():
   if logined_by_cookie():
     # refactoring
-    app.logger.info('Logined by cookies:\t'+str(request.cookies.get('id'))) # debug
-    return request.cookies.get('id')
+    user_id = request.cookies.get('id')
+    app.logger.info('Logined by cookies:\t'+str(user_id)) # debug
+    return int(user_id)
   else:
     return None
 
@@ -198,15 +220,16 @@ def check_passwd(login, password):
 def logined_by_cookie():
   user_id = str(request.cookies.get('id'))
   user_hash = request.cookies.get('hash')
-  app.logger.info('UserID from cookie:\t'+user_id+' '+user_hash) # debug
+  if user_hash:
+    app.logger.info('UserID from cookie:\t'+user_id+' '+user_hash) # debug
 
-  if not user_id == str('None'): # if user_id exist
-    cur = db.session.execute("SELECT cookie FROM user WHERE id='{0}'".format(user_id))
-    cookie = cur.fetchone()[0] # getting hash
-    app.logger.info('Cookie from db:\t\t'+str(cookie)) # debug
-    
-    if str(cookie) == str(user_hash):
-      return True # yeah LOGINED
+    if not user_id == str('None'): # if user_id exist
+      cur = db.session.execute("SELECT cookie FROM user WHERE id='{0}'".format(user_id))
+      cookie = cur.fetchone()[0] # getting hash
+      app.logger.info('Cookie from db:\t\t'+str(cookie)) # debug
+
+      if str(cookie) == str(user_hash):
+        return True # yeah LOGINED
     
   return False
 
