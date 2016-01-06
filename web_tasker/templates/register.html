@@ -1,12 +1,14 @@
  
-{% extends "head.html" %}
-{% block content %}
-  {% include "menu.html" %}
-  <div class="page-header">
-    <h1>Пройдите не сложную регистрацию</h1>
-  </div>
-  {% include "localmenu.html" %}
-  <div class="container well-lg register_form">
+    {% extends "head.html" %}
+    {% block content %}
+
+    <div class="page-header">
+      <h1>Пройдите не сложную регистрацию</h1>
+    </div>
+    {% include "localmenu.html" %}
+    {% include "menu.html" %}
+  </div> {# id="header" #}
+  <div id="content" class="container well-lg register_form">
     <form role="form" action="" method="post">
       <label for="login">Логин:</label><input class="form-control well-sm" type="text" name="username">
       <div class="form-group">
@@ -21,4 +23,5 @@
     </form>
   </div>
   {%  include "footer.html" %}
+</div> {# id="wrapper" #}
 {% endblock %}
