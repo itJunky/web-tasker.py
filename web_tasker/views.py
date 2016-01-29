@@ -1,9 +1,12 @@
 # -*- coding: utf-8 -*-
-from web_tasker import app, db, models
+
 from flask import Flask, render_template, request, send_from_directory, request, make_response, session, redirect, url_for
 from datetime import datetime
 
 import logging
+
+from web_tasker import app, db
+from web_tasker.models import *
 
 @app.route("/")
 def index():
@@ -49,7 +52,7 @@ def task(action='list'):
       cur = db.session.execute("SELECT id FROM user WHERE nickname='{}'".format(get_nick()))
       user_id = cur.fetchone()[0]
       # Example of sqlAlchemy usage
-      task_row = models.Task(user_id=user_id, taskname=request.form['taskname'], body=request.form['taskbody'], timestamp=datetime.now(), status='Active')
+      task_row = Task(user_id=user_id, taskname=request.form['taskname'], body=request.form['taskbody'], timestamp=datetime.now(), status='Active')
       db.session.add(task_row)
       db.session.commit()
       return redirect(url_for('task'))
@@ -83,7 +86,7 @@ def task(action='list'):
       try:
         cur = db.session.execute("SELECT id FROM user WHERE nickname='{}'".format(nickname))
         user_id = cur.fetchone()[0]
-        db.session.query(models.Task).filter_by(id=request.form['taskid']).update({'taskname':request.form['taskname'], 'status':request.form['taskstatus'], 'body':request.form['taskbody']})
+        db.session.query(Task).filter_by(id=request.form['taskid']).update({'taskname':request.form['taskname'], 'status':request.form['taskstatus'], 'body':request.form['taskbody']})
         db.session.commit()
         return redirect(url_for('task'))
       except TypeError: return redirect(url_for('do_login'))
@@ -104,7 +107,7 @@ def task(action='list'):
 @app.route("/comment_to_task", methods=['POST'])
 def post_comment_to_task():
   app.logger.info('### Post Comment to db ###') # debug
-  new_comment = models.Comments(user_id=check_user(), task_id=request.form['taskid'], timestamp=datetime.now(), text=request.form.get('commenttext'))
+  new_comment = Comments(user_id=check_user(), task_id=request.form['taskid'], timestamp=datetime.now(), text=request.form.get('commenttext'))
   db.session.add(new_comment)
   db.session.commit()
   return redirect(url_for('task', action='view', id=int(request.form['taskid'])))
@@ -137,7 +140,7 @@ def do_login():
       response.set_cookie('id', value=str(user_id))
       response.set_cookie('hash', value=auth_hash)
       response.set_cookie('logged_at', value=str(datetime.now()))
-      db.session.query(models.User).filter_by(id=user_id).update({'cookie':auth_hash})
+      db.session.query(User).filter_by(id=user_id).update({'cookie':auth_hash})
       db.session.commit()
       #sql = "UPDATE user SET cookie='{}' WHERE id='{}'".format(auth_hash, user_id)
       #app.logger.info('SQL:\t'+str(sql)) # debug
@@ -166,11 +169,11 @@ def register_user():
     salt = '$6$FIXEDS'
     pass_hash = crypt.crypt(request.form.get('password'), salt)
     app.logger.info('Generated hash:\t'+pass_hash) # debug
-    user_row = models.User(nickname=request.form.get('username'),
+    user_row = User(nickname=request.form.get('username'),
 			                     email=request.form.get('email'), 
                            password=request.form.get('password'),
                            p_hash=pass_hash,
-                           role=models.ROLE_USER, register_date=datetime.now())
+                           role=ROLE_USER, register_date=datetime.now())
     db.session.add(user_row)
     db.session.commit()
     return redirect(url_for('index'))
@@ -249,3 +252,4 @@ import string
 def id_generator(size=8, chars=string.ascii_uppercase + string.digits):
     import random
     return ''.join(random.choice(chars) for _ in range(size))
+

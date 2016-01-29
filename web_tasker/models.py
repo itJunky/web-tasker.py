@@ -1,8 +1,11 @@
-from web_tasker import db
-import datetime
+#from web_tasker import db
+from flask.ext.sqlalchemy import SQLAlchemy
+from datetime import datetime
 
 ROLE_USER = 0
 ROLE_ADMIN = 1
+
+db = SQLAlchemy()
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key = True)
