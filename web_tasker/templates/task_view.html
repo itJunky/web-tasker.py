@@ -15,9 +15,9 @@
       <tr><td>Имя</td><td><div class="well well-sm">{{ task_expl[0] }}</div></td></td></tr>
       <tr><td>Текст</td><td><pre class="well-lg">{{ task_expl[1] }}</pre></td></tr>
     </table>
-    <div class="comments-section">
+    {% if comments %}
+      <div align="center" class="comments-section">
       <hr class="style-one"> {# comments section #}
-      <p align="center">Коменты</p><br>
       {% for comment in comments %}
         <table class="tasklist table">
           <tr><td>Время</td><td>{{ comment[2] }}</td></tr>
@@ -26,7 +26,9 @@
         </table>
       {% endfor %}
       <hr class="style-two"> {# form section #}
-    </div>
+      </div>
+    {% endif %}
+    
     <form action="/comment_to_task" method="post"><div class="form-group">
       <table class="tasklist table">
         <input type="hidden" name="taskid" value="{{ task_opened }}" />

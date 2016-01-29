@@ -5,9 +5,9 @@
     <div class="page-header">
       <h1>Изменение задачи №{{ task_edited }}</h1>
     </div>
+    {% include "menu.html" %}
     {% include "localmenu.html" %}
     {% include "taskmenu.html" %} 
-    {% include "menu.html" %}
   </div> {# id="header" #}
   <div id="content" class="container page-header">
     {% if task_expl %}

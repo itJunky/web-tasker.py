@@ -7,9 +7,9 @@
       <ul class="nav navbar-nav">
         {% if user %}
           <li {%- if request.path == "/profile" %} class="active" {% endif %}>
-	    <a href="/profile">Профиль</a>
+	    <a href="/project">Проекты</a>
 	  </li>
-          <li {%- if request.path == "/task*" %} class="active" {% endif %}>
+          <li {%- if request.path == "/task" %} class="active" {% endif %}>
 	    <a href="/task">Задачи</a>
 	  </li>
           <li><a href="/logout">Выйти</a></li>

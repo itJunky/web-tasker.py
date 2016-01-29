@@ -3,7 +3,7 @@ import logging
 #logging.basicConfig()
 
 log = logging.getLogger()
-log.setLevel(logging.ERROR)
+log.setLevel(logging.INFO)
 
 sql_log = logging.getLogger('sqlalchemy.engine')
 sql_log.setLevel(logging.DEBUG)
@@ -11,7 +11,6 @@ sql_log.setLevel(logging.DEBUG)
 requests_log = logging.getLogger("requests.packages.urllib3")
 requests_log.setLevel(logging.DEBUG)
 requests_log.propagate = True
-
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=8080, debug=True)

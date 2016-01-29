@@ -1,10 +1,17 @@
 {% block navbar %}
-  <div class="mainmenu navbar navbar-fixed-top well-lg">
-    <!-- Меню -->
-    <div style="text-align: center"><strong>{{ user }}</strong></div>
-    <a href="/">Главная</a>
-    <a href="/users">Пользователи</a>
-    <a href="/groups">Группы</a></br>
-    <a href="/about">О нас</a>
-  </div>
+  <nav class="navmenu navmenu-default" role="navigation">
+    <div class="mainmenu navbar navbar-fixed-top well-lg">
+      <!-- Меню -->
+      <div style="text-align: center" class="navmenu-brand">
+        <strong>{{ user }}</strong><br><br>
+      </div>
+      <ul class="nav navmenu-nav">
+        <li class="mainmenuline"><a href="/">Главная</a></li>
+        <li class="mainmenuline"><a href="/profile">Профиль</a></li>
+        <li class="mainmenuline"><a href="/users">Пользователи</a></li>
+        <li class="mainmenuline"><a href="/groups">Группы</a></li>
+        <li class="mainmenuline"><a href="/about">О нас</a></li>
+      </ul>
+    </div>
+  </nav>
 {% endblock %}
