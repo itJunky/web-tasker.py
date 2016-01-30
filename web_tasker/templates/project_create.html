@@ -1,0 +1,19 @@
+
+{% extends "head.html" %}
+{% block content %}
+  
+  <div class="page-header">
+    <h1>Создание проекта для {{ user }}</h1>
+  </div>
+  {% include "menu.html" %}
+  {% include "localmenu.html" %}
+  <div class="container well-lg">
+    <form action="" method="post">
+    <table class="table">
+      <tr><td>Имя проекта</td><td><input class="form-control well-lg" required type='text' name='projectname'></td></tr>
+      <tr><td colspan="2"><input class="btn btn-primary btn-block" type='submit' value='Отправить'></td></tr>
+    </table>
+    </form>
+  </div>
+  {%  include "footer.html" %}
+{% endblock %}

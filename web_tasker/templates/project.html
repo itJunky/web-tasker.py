@@ -1,0 +1,36 @@
+
+    {% extends "head.html" %}
+    {% block content %}
+  
+    <div class="page-header">
+      {% if project_status == True %}
+        <h1>Открытые проекты для {{ user }}</h1>
+      {% else %}
+        <h1>Выполненные проекты для {{ user }}</h1>
+      {% endif %}
+    </div>
+    {% include "localmenu.html" %}
+    {% include "menu.html" %}
+    {% include "projectmenu.html" %}
+  </div> {# id="header" #}
+  <div id='content' class="container panel-group">
+    <table class="tasklist table table-striped table-hover table-condense">
+      <tr>
+        <td><div class="panel-heading"><strong>№</strong></div></td>
+        <td><div class="panel-heading"><strong>Имя</strong></div></td>
+        <td><div class="panel-heading"><strong>Пользователи</strong></div></td>
+        <td></td>
+      </div>
+      {% for project in project_list %}
+      <tr>
+        <td><div class="tasklistelement panel-body">{{ project[0] }}</div></td>
+        <td><div class="tasklistelement panel-body"><a href="/project/view?id={{ project[0] }}">{{ project[1] }}</a></td>
+        <td><div class="tasklistelement panel-body jumbotron">{{ project[2] }}</div></td>
+        <td><div class="tasklistelement panel-body"><a href="/project/edit?id={{ project[0] }}">Изменить</a></div></td>
+      </tr>
+      {% endfor %}
+    </table>
+  </div>
+  {%  include "footer.html" %}
+</div> {# id="wrapper" #}
+{% endblock %}

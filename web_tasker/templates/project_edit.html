@@ -1,0 +1,54 @@
+
+    {% extends "head.html" %}
+    {% block content %}
+
+    <div class="page-header">
+      <h1>Редактирование проекта № {{ project[0] }}</h1>
+    </div>
+    {% include "menu.html" %}
+    {% include "localmenu.html" %}
+  </div> {# id="header" #}
+  <div id="content" class="container well-lg">
+    {% if project %}
+      <form action="" method="post">
+      <table class="table">
+        <input type="hidden" name="project_id" value="{{ project[0] }}" />
+        <tr><td style="width: 25%">Имя проекта</td><td><input class="form-control well-lg" required type='text' name='projectname' value="{{ project[1] }}"></td></tr>
+        <tr>
+          <td>Список пользователей</td>
+          <td>
+            <ul class="list-inline"> 
+            {% for user in project[3] %}
+              <li>
+              <div class="well well-sm">
+                {{ user }} <a href='/project/rmuser?id={{ project[2][loop.index] }}' alt='Удалить пользователя'>-</a>
+              </div>
+              </li>
+            {% endfor %}
+            </ul>
+          </td>
+        </tr>
+        <tr>
+          <td>Добавить пользователя в проект</td>
+          <td>
+            <div class="dropdown">
+             <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Выпадающий список
+            </button>
+            <ul class="dropdown-menu">
+             <li><a href="#">HTML</a></li>
+             <li><a href="#">CSS</a></li>
+             <li><a href="#">JavaScript</a></li>
+            </ul>
+            </div>
+          </td>
+        </tr>  
+        <tr><td colspan="2"><input class="btn btn-primary btn-block" type='submit' value='Отправить'></td></tr>
+      </table>
+      </form>
+    {% else %}
+      Пусто
+    {% endif %}
+  </div>
+  {%  include "footer.html" %}
+</div> {# id="wrapper" #}
+{% endblock %}

@@ -35,17 +35,24 @@ def task(action='list'):
 
   ### Showing task list
   if action == 'list' or action == 'list_closed':
+    project_id = request.args.get('project_id')
+    app.logger.info('Project ID is:\t'+str(project_id)) # debug
+    if project_id == None:
+      project_id = request.cookies.get('project_id')
+      if project_id == None:
+        project_id = get_first_project_id(user_id)
+
     # rewrite to sqlalchemy like User.query.all() or User.query.filter() like in edit section
     # http://flask.pocoo.org/docs/0.10/patterns/sqlalchemy/
     if action == 'list_closed':
       task_status = False # for taskmenu
-      cur = db.session.execute("SELECT id, taskname, timestamp FROM task WHERE status='Disabled' AND user_id='{}'".format(user_id))
+      cur = db.session.execute("SELECT id, taskname, timestamp FROM task WHERE status='Disabled' AND user_id='{}' AND project_id='{}'".format(user_id, project_id))
     else:
       task_status = True # for taskmenu
-      cur = db.session.execute("SELECT id, taskname, timestamp FROM task WHERE status!='Disabled' AND user_id='{}'".format(user_id))
+      cur = db.session.execute("SELECT id, taskname, timestamp FROM task WHERE status!='Disabled' AND user_id='{}' AND project_id='{}'".format(user_id, project_id))
 
     tasks = cur.fetchall()  
-    return render_template('task.html', tittle='Задачи', user=get_nick(), task_list=tasks, task_status=task_status)
+    return render_template('task.html', title=u'Задачи', user=get_nick(), task_list=tasks, task_status=task_status)
 
   ### Creating task
   elif action=='create':
@@ -53,12 +60,13 @@ def task(action='list'):
       # Getting user id
       cur = db.session.execute("SELECT id FROM user WHERE nickname='{}'".format(get_nick()))
       user_id = cur.fetchone()[0]
+      project_id = request.cookies.get('project_id')
       # Example of sqlAlchemy usage
-      task_row = Task(user_id=user_id, taskname=request.form['taskname'], body=request.form['taskbody'], timestamp=datetime.now(), status='Active')
+      task_row = Task(user_id=user_id, project_id=project_id, taskname=request.form['taskname'], body=request.form['taskbody'], timestamp=datetime.now(), status='Active')
       db.session.add(task_row)
       db.session.commit()
-      return redirect(url_for('task'))
-    return render_template('task_create.html', tittle='Задачи', user=get_nick())
+      return redirect(url_for('task', action='list', project_id=project_id))
+    return render_template('task_create.html', title=u'Задачи', user=get_nick())
 
   ### Explain task 
   elif action=='view':
@@ -70,10 +78,10 @@ def task(action='list'):
       user_id = cur.fetchone()[0]
       task_explained = db.session.execute("SELECT taskname,body,timestamp FROM task WHERE id='{}' AND user_id='{}'".format(task_id, user_id))
       all_comments = db.session.execute("SELECT c.id,c.user_id,c.timestamp,c.text,u.nickname FROM comment c, user u WHERE c.task_id='{}' and c.user_id=u.id".format(task_id))
-      #all_comments = db.session.query(models.Comment).filter_by(task_id=task_id).all()
+      #all_comments = db.session.query(Comment).filter_by(task_id=task_id).all()
       app.logger.debug('### End viewing ###')
       # may be need redirect to internal func here
-      return render_template('task_view.html', tittle='Задачи', user=nickname,
+      return render_template('task_view.html', title=u'Задачи', user=nickname,
                               task_expl=task_explained.fetchone(), task_opened=task_id,
                               comments=all_comments.fetchall())
     except TypeError: # if not logined go to login
@@ -91,9 +99,9 @@ def task(action='list'):
       try:
         user_id = cur.fetchone()[0]
         cur = db.session.execute("SELECT taskname,body,timestamp,status FROM task WHERE id='{}' AND user_id='{}'".format(task_edited, user_id))
-        return render_template('task_modify.html', tittle='Задачи', user=nickname, task_edited=task_edited, task_expl=cur.fetchone())
+        return render_template('task_modify.html', title=u'Задачи', user=nickname, task_edited=task_edited, task_expl=cur.fetchone())
       except TypeError: pass
-      return render_template('task_modify.html', tittle='Задачи', user=nickname, task_edited=task_edited)
+      return render_template('task_modify.html', title=u'Задачи', user=nickname, task_edited=task_edited)
     elif request.method == 'POST':
       try:
         cur = db.session.execute("SELECT id FROM user WHERE nickname='{}'".format(nickname))
@@ -132,20 +140,19 @@ def project(action='list'):
   if action == 'list' or action == 'list_closed':
     if action == 'list_closed':
       project_status = False
-      cur = db.session.execute("SELECT id FROM project WHERE option='user' and value='{}'".format(user_id))
-      project_ids = cur.fetchall()[0]
+      project_ids = get_projects_for_user(user_id, 'Disabled')
     else:
       project_status = True
-      project_ids = db.session.query(models.Project_association.project_id).filter_by(user_id=user_id)
+      project_ids = get_projects_for_user(user_id, 'Active')
 
     app.logger.debug('project_ids: '+str(project_ids)) # debug
     if project_ids:
       projects = []
       for project_id in project_ids:
-        project_name = db.session.query(models.Project.name).filter_by(id=project_id[0]).all()[0]
+        project_name = db.session.query(Project.name).filter_by(id=project_id[0]).all()[0]
         projects.append([project_id[0], project_name[0]])
         # app.logger.debug('project_id is: '+str(project_id[0])+' name is '+str(project_name)) # debug
-    return render_template('project.html', tittle='Проекты', user=get_nick(), project_list=projects, project_status=project_status)
+    return render_template('project.html', title=u'Проекты', user=get_nick(), project_list=projects, project_status=project_status)
 
   ### Create new Project ###
   elif action == 'create':
@@ -157,15 +164,23 @@ def project(action='list'):
       #       Project ID
       project_name = request.form.get('projectname')
 
-      db.session.add(models.Project(name=project_name))
+      db.session.add(Project(name=project_name))
       db.session.commit()
-      project_id = db.session.query(models.Project.id).filter_by(name=project_name)
-      db.session.add(models.Project_association(user_id=user_id, project_id=project_id[0][0]))
+      project_id = db.session.query(Project.id).filter_by(name=project_name)
+      db.session.add(Project_association(user_id=user_id, project_id=project_id[0][0]))
       db.session.commit()
       return redirect(url_for('project')) # got to project list
 
     else: # if GET request
-      return render_template('project_create.html', tittle='Проекты', user=get_nick(), user_id=user_id)
+      return render_template('project_create.html', title=u'Проекты', user=get_nick(), user_id=user_id)
+
+  ### View Project ###
+  elif action == 'view':
+    project_id = str(request.args.get('id'))
+    app.logger.debug('Project ID for view: '+str(project_id)) # debug
+    response = app.make_response(redirect(url_for('task', action='list', project_id=project_id)))
+    response.set_cookie('project_id', value=project_id)
+    return response # go to task list with cookie 'project_id' set
 
   ### Edit Project ###
   elif action == 'edit':
@@ -177,11 +192,11 @@ def project(action='list'):
       #       Project Name
       #       Project Users
       project_id = request.args.get('id')
-      project_name = db.session.query(models.Project.name).filter_by(id=project_id).all()[0]
-      project_user_ids = db.session.query(models.Project_association.user_id).filter_by(project_id=project_id).all()
+      project_name = db.session.query(Project.name).filter_by(id=project_id).all()[0]
+      project_user_ids = db.session.query(Project_association.user_id).filter_by(project_id=project_id).all()
       project_user_names = []
       for user_id in project_user_ids:
-        name = db.session.query(models.User.nickname).filter_by(id=user_id[0]).all()[0]
+        name = db.session.query(User.nickname).filter_by(id=user_id[0]).all()[0]
         project_user_names.append(name[0])
 
       app.logger.debug('### Project # Edit ### id from form: '+str(project_id[0])+'\n'+ \
@@ -189,7 +204,7 @@ def project(action='list'):
                         'User IDs: '+str(project_user_ids)+'\n'+ \
                         'Users in project: '+str(project_user_names) ) # debug
       project_full_data = [project_id, project_name[0], project_user_ids, project_user_names]
-      return render_template('project_edit.html', tittle='Проекты', user=get_nick(), project=project_full_data)
+      return render_template('project_edit.html', title=u'Проекты', user=get_nick(), project=project_full_data)
 
 
 @app.route("/profile")
@@ -202,7 +217,7 @@ def profile():
 
 @app.route("/about")
 def about():
-    return render_template('about.html', tittle='О сайте')
+    return render_template('about.html', title=u'О сайте')
 
 
 @app.route("/login", methods=['GET', 'POST'])
@@ -250,7 +265,7 @@ def register_user():
       return 'mail exist'
     else:
       # Prepare empty project for user
-      new_project = models.Project(name=u'Привет проект')
+      new_project = Project(name=u'Привет проект')
       db.session.add(new_project)
       db.session.commit()
       # Prepare user data to insert in db
@@ -262,7 +277,7 @@ def register_user():
   			                     email=request.form.get('email'), 
                              password=request.form.get('password'),
                              p_hash=pass_hash,
-                             role=models.ROLE_USER,
+                             role=ROLE_USER,
                              register_date=datetime.now())
       db.session.add(user_row)
       db.session.commit()
@@ -356,6 +371,19 @@ def get_hash_from_db(username):
   cur = db.session.execute("SELECT p_hash FROM user WHERE nickname='{0}'".format(username))
   return cur.fetchone()
 
+def get_projects_for_user(user_id, status='Active'):
+  if status == 'Disabled':
+    project_status = False
+    cur = db.session.execute("SELECT id FROM project WHERE status='Disabled' and value='{}'".format(user_id))
+    project_ids = cur.fetchall()[0]
+  else:
+    project_status = True
+    project_ids = db.session.query(Project_association.project_id).filter_by(user_id=user_id)
+
+  return project_ids
+
+def get_first_project_id(user_id):
+  return 1
 
 import string
 def id_generator(size=8, chars=string.ascii_uppercase + string.digits):

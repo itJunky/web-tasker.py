@@ -1,0 +1,19 @@
+<nav class="taskmenu nav navbar">  
+  <div class="navbar-header">
+    <label class="navbar-brand">Проекты</label>
+  </div>
+  <ul class="nav navbar-nav taskmenu-elem">
+    <li><a href='/project/create'>Создать новый проект</a></li>
+      {% if project_opened %}
+      {# если внутри задачи #}
+        <li><a href='/project/edit?id={{ project_opened }}'>Изменить проект</a></li>
+      {% else %}
+        {% if project_status == True %}
+          <li><a href='/project/list_closed'>Завершённые</a></li>
+        {% else %}
+          <li><a href='/project'>Открытые</a></li>
+        {% endif  %}
+      {% endif %}
+    <li><a href='/project/delete'>Удалить проект</a></li>
+  </ul>
+</nav>
