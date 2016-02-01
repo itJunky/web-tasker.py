@@ -51,7 +51,18 @@ def task(action='list'):
       task_status = True # for taskmenu
       cur = db.session.execute("SELECT id, taskname, timestamp FROM task WHERE status!='Disabled' AND user_id='{}' AND project_id='{}'".format(user_id, project_id))
 
-    tasks = cur.fetchall()  
+    tasks = cur.fetchall() 
+
+    # removing microseconds
+    tasks_short_date = []
+    for task in tasks:
+        app.logger.info('Task preview:\t'+str(task[2])) # debug
+        tasks_short_date.append([task[0], task[1], task[2].split(".")[0]])
+
+    app.logger.info('Task preview:\t'+str(tasks_short_date)) # debug
+    tasks = tasks_short_date
+    # removing microseconds #
+
     return render_template('task.html', title=u'Задачи', user=get_nick(), task_list=tasks, task_status=task_status)
 
   ### Creating task
@@ -117,7 +128,7 @@ def task(action='list'):
 @app.route("/comment_to_task", methods=['POST'])
 def post_comment_to_task():
   app.logger.info('### Post Comment to db ###') # debug
-  new_comment = Comment(user_id=check_user(), task_id=request.form['taskid'], timestamp=datetime.now(), text=request.form.get('commenttext'))
+  new_comment = Comment(user_id=get_user_id(), task_id=request.form['taskid'], timestamp=datetime.now(), text=request.form.get('commenttext'))
   db.session.add(new_comment)
   db.session.commit()
   return redirect(url_for('task', action='view', id=int(request.form['taskid'])))

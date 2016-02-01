@@ -29,8 +29,6 @@ class Project(db.Model):
     def __repr__(self):
         return '<Project %r have users %r>' % (self.name, self.users)
 
-db = SQLAlchemy()
-
 class User(db.Model):
     __tablename__   ='user'
 
