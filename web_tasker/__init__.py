@@ -6,26 +6,24 @@ from flask.ext.sqlalchemy import SQLAlchemy
 
 def create_app(config_filename):
   # for static files
-  app = Flask(__name__, static_url_path='/static/', instance_relative_config=True)
-  app.config.from_pyfile(config_filename)
+  app = Flask(__name__, instance_relative_config=True, instance_path='/code')
+  app.config.from_pyfile(os.path.join(app.instance_path, config_filename))
   app.config['STATIC_URL_PATH'] = 'static'
-  app.config['DEBUG'] = True
+  #app.config['DEBUG'] = True
 
   bootstrap = Bootstrap()
   bootstrap.init_app(app)
 
-  ## set the secret key.  keep this really secret:
-  #app.secret_key = 'A0Zr98j/3yX R~XHH!jmN]LWX/,?RT'
-
+  # show startup flask variables
   from pprint import pprint
   items = app.config.viewitems()
-  for i in items:
-      print(i)
+  for i in items: pass
+      # print(i)
 
   return app
 
 import os
-app = create_app(os.path.join('/www/tasker.itjunky.ws/web-tasker.py','config_db.py'))
+app = create_app('config_db.py')
 
 ## prepare database
 from web_tasker.models import db
