@@ -48,12 +48,14 @@ class Task(db.Model):
     __tablename__   ='task'
 
     id              = db.Column(db.Integer, primary_key = True)
+    parent_id       = db.Column(db.Integer, default=0, index = True)
     body            = db.Column(db.String())
     taskname        = db.Column(db.String(140))
     timestamp       = db.Column(db.DateTime)
     user_id         = db.Column(db.Integer, db.ForeignKey('user.id'))
     project_id      = db.Column(db.Integer, index = True)
     status          = db.Column(db.String(10))
+    depth           = db.Column(db.Integer, default=0)
 
     def __repr__(self):
         return '<Task %r>' % (self.body)
@@ -69,3 +71,4 @@ class Comment(db.Model):
 
     def __repr__(self):
         return '<Comment %r>' % (self.text)
+

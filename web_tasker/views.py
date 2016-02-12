@@ -34,33 +34,58 @@ def task(action='list'):
   app.logger.info('Task viewing by user:\t'+str(user_id)) # debug
 
   ### Showing task list
+  # Need:
+  #       User ID (upper)
+  #       Project ID
+  #       Project Name (SQL)
+  #       Parent ID (SQL)
+  #       Depth in tree (SQL)
   if action == 'list' or action == 'list_closed':
     project_id = request.args.get('project_id')
     app.logger.info('Project ID is:\t'+str(project_id)) # debug
-    if project_id == None:
+    if project_id == None: # if no id in form try cookie, because it from last session
       project_id = request.cookies.get('project_id')
-      if project_id == None:
+      if project_id == None: # if no id in cookie, get least of all user's projects
         project_id = get_first_project_id(user_id)
 
     # rewrite to sqlalchemy like User.query.all() or User.query.filter() like in edit section
     # http://flask.pocoo.org/docs/0.10/patterns/sqlalchemy/
     if action == 'list_closed':
       task_status = False # for taskmenu
-      cur = db.session.execute("SELECT id, taskname, timestamp FROM task WHERE status='Disabled' AND user_id='{}' AND project_id='{}'".format(user_id, project_id))
+      cur = db.session.execute("SELECT id, taskname, timestamp, parent_id, depth FROM task WHERE status='Disabled' AND depth=0 AND user_id='{}' AND project_id='{}'".format(user_id, project_id))
     else:
       task_status = True # for taskmenu
-      cur = db.session.execute("SELECT id, taskname, timestamp FROM task WHERE status!='Disabled' AND user_id='{}' AND project_id='{}'".format(user_id, project_id))
+      # Get deepest depth
+      cur = db.session.execute("SELECT MAX(depth) FROM task WHERE status!='Disabled' AND user_id='{}' AND project_id='{}'".format(user_id, project_id))
+      max_depth = cur.fetchone()[0]
+      app.logger.debug('Max depth:\t'+str(max_depth)) # debug
+      tasks = []
+      # Get named list from db query
+      for depth in xrange(0,max_depth+1):
+        cur = db.session.execute("SELECT id, taskname, timestamp, parent_id, depth FROM task WHERE status!='Disabled' AND depth='{}' AND user_id='{}' AND project_id='{}'".format(depth, user_id, project_id))
+        tasks_tmp = cur.fetchall()
+        for t in tasks_tmp:
+          tasks.append(t)
 
-    tasks = cur.fetchall() 
+    #tasks = cur.fetchall() 
+
+      # sort by tree (two level sort)
+      sorted_list = []
+      tasks = QuickSort(tasks, 0, sorted_list)
+      app.logger.debug('Tasks is:\n'+str(tasks)) # debug
 
     # removing microseconds
     tasks_short_date = []
     for task in tasks:
-        app.logger.info('Task preview:\t'+str(task[2])) # debug
-        tasks_short_date.append([task[0], task[1], task[2].split(".")[0]])
+      #app.logger.info('Task preview:\t'+str(task[2])) # debug
+      # tasks_short_date.append([task[0], task[1], task[2].split(".")[0], task[3], task[4]])
+      tasks_short_date.append([task['id'], task['name'], task['date'].split(".")[0], task['parent'], task['depth']])
 
-    app.logger.info('Task preview:\t'+str(tasks_short_date)) # debug
+    #app.logger.info('Task preview:\t'+str(tasks_short_date)) # debug
     tasks = tasks_short_date
+    # for task in tasks:
+    #   app.logger.debug('Task preview:\t'+str(task)) # debug
+      # app.logger.debug('Task preview:\t'+str(task[4])+' '+str(task[0])+' '+str(task[3])) # debug
     # removing microseconds #
 
     return render_template('task.html', title=u'Задачи', user=get_nick(), task_list=tasks, task_status=task_status)
@@ -401,3 +426,16 @@ def id_generator(size=8, chars=string.ascii_uppercase + string.digits):
     import random
     return ''.join(random.choice(chars) for _ in range(size))
 
+def QuickSort(lst, parent_id, sorteded):
+  # app.logger.debug('LIST FOR SORTING:\n'+str(lst)) # debug
+  sorted_list = sorteded
+  for eid, taskname, date, parent, depth in lst:
+    if parent == parent_id:
+      element = {'id': eid, 'name': taskname, 'date': date, 'parent': parent, 'depth': depth}
+      sorted_list.append(element)
+      t = QuickSort(lst, eid, sorted_list)
+      app.logger.debug('PARENT:'+str(parent)+' CHILDS: '+str(t)) # debug
+      # sorted_list.append(t)
+
+  # app.logger.debug('LIST AFTER SORTING:\n'+str(sorted_list)) # debug
+  return sorted_list
