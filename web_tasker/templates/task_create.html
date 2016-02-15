@@ -9,9 +9,21 @@
   <div class="container well-lg">
     <form action="" method="post">
     <table class="table">
-      <tr><td>Имя</td><td><input class="form-control well-lg" required type=text name=taskname></td></tr>
-      <tr><td>Текст</td><td><textarea class="form-control well-lg" required type=text name=taskbody></textarea></td></tr>
-      <tr><td colspan="2"><input class="btn btn-primary btn-block" type=submit value='Отправить'></td></tr>
+      <tr>
+        <td width="10%">Имя</td>
+        <td><input class="form-control well-lg" required type=text name=taskname> </td>
+      </tr>
+      <tr>
+        <td>Текст</td>
+        <td><textarea class="form-control well-lg" required type=text name=taskbody></textarea></td>
+      </tr>
+        <tr><td>Родительская задача №</td>
+        {% set parent_id = 0 %}
+        <td><input class="form-control well-lg" required type=text name=taskparent value="{{ parent_id }}"></td>
+      </tr>
+      <tr>
+        <td colspan="2"><input class="btn btn-primary btn-block" type=submit value='Отправить'></td>
+      </tr>
     </table>
     </form>
   </div>

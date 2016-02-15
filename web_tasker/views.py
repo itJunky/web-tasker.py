@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 
 from flask import Flask, render_template, request, send_from_directory, request, make_response, session, redirect, url_for
+# for custom HTTP statuses
+#from flask.ext.api import status 
+HTTP_403_FORBIDDEN = 403
 from datetime import datetime
 
 import logging
@@ -31,7 +34,7 @@ def task(action='list'):
     return redirect(url_for('do_login')) # if not logined go to login
   else:
     user_id = get_user_id()
-  app.logger.info('Task viewing by user:\t'+str(user_id)) # debug
+  # app.logger.info('Task viewing by user:\t'+str(user_id)) # debug
 
   ### Showing task list
   # Need:
@@ -53,41 +56,38 @@ def task(action='list'):
     if action == 'list_closed':
       task_status = False # for taskmenu
       cur = db.session.execute("SELECT id, taskname, timestamp, parent_id, depth FROM task WHERE status='Disabled' AND depth=0 AND user_id='{}' AND project_id='{}'".format(user_id, project_id))
-    else:
+    else: # Show opened tasks
       task_status = True # for taskmenu
       # Get deepest depth
-      cur = db.session.execute("SELECT MAX(depth) FROM task WHERE status!='Disabled' AND user_id='{}' AND project_id='{}'".format(user_id, project_id))
+      cur = db.session.execute("SELECT MAX(depth) \
+                                FROM task \
+                                WHERE status!='Disabled' \
+                                  AND user_id='{}' \
+                                  AND project_id='{}'".format(user_id, project_id))
       max_depth = cur.fetchone()[0]
+      if max_depth is None: return 'Not Your task',HTTP_403_FORBIDDEN
       app.logger.debug('Max depth:\t'+str(max_depth)) # debug
       tasks = []
       # Get named list from db query
       for depth in xrange(0,max_depth+1):
-        cur = db.session.execute("SELECT id, taskname, timestamp, parent_id, depth FROM task WHERE status!='Disabled' AND depth='{}' AND user_id='{}' AND project_id='{}'".format(depth, user_id, project_id))
+        cur = db.session.execute("SELECT id, taskname, timestamp, parent_id, depth \
+                                  FROM task \
+                                  WHERE status!='Disabled' \
+                                    AND depth='{}' \
+                                    AND user_id='{}' \
+                                    AND project_id='{}'".format(depth, user_id, project_id))
         tasks_tmp = cur.fetchall()
         for t in tasks_tmp:
           tasks.append(t)
 
     #tasks = cur.fetchall() 
 
-      # sort by tree (two level sort)
+      # sort by tree
       sorted_list = []
       tasks = QuickSort(tasks, 0, sorted_list)
       app.logger.debug('Tasks is:\n'+str(tasks)) # debug
 
-    # removing microseconds
-    tasks_short_date = []
-    for task in tasks:
-      #app.logger.info('Task preview:\t'+str(task[2])) # debug
-      # tasks_short_date.append([task[0], task[1], task[2].split(".")[0], task[3], task[4]])
-      tasks_short_date.append([task['id'], task['name'], task['date'].split(".")[0], task['parent'], task['depth']])
-
-    #app.logger.info('Task preview:\t'+str(tasks_short_date)) # debug
-    tasks = tasks_short_date
-    # for task in tasks:
-    #   app.logger.debug('Task preview:\t'+str(task)) # debug
-      # app.logger.debug('Task preview:\t'+str(task[4])+' '+str(task[0])+' '+str(task[3])) # debug
-    # removing microseconds #
-
+    tasks = remove_microseconds(tasks)
     return render_template('task.html', title=u'Задачи', user=get_nick(), task_list=tasks, task_status=task_status)
 
   ### Creating task
@@ -97,8 +97,17 @@ def task(action='list'):
       cur = db.session.execute("SELECT id FROM user WHERE nickname='{}'".format(get_nick()))
       user_id = cur.fetchone()[0]
       project_id = request.cookies.get('project_id')
+      cur = db.session.execute("SELECT depth FROM task WHERE id='{}'".format(request.form['taskparent']))
+      parent_depth = cur.fetchone()[0]
       # Example of sqlAlchemy usage
-      task_row = Task(user_id=user_id, project_id=project_id, taskname=request.form['taskname'], body=request.form['taskbody'], timestamp=datetime.now(), status='Active')
+      task_row = Task(user_id=user_id,
+                      project_id=project_id,
+                      taskname=request.form['taskname'],
+                      body=request.form['taskbody'],
+                      parent_id=request.form['taskparent'],
+                      timestamp=datetime.now(),
+                      depth=int(parent_depth)+1,
+                      status='Active')
       db.session.add(task_row)
       db.session.commit()
       return redirect(url_for('task', action='list', project_id=project_id))
@@ -106,8 +115,8 @@ def task(action='list'):
 
   ### Explain task 
   elif action=='view':
-    app.logger.debug('### Start viewing ###')
     task_id = request.args.get('id')
+    app.logger.debug('### Start viewing {} ###'.format(task_id))
     nickname = get_nick()
     cur = db.session.execute("SELECT id FROM user WHERE nickname='{}'".format(nickname))
     try: # if logined
@@ -134,7 +143,10 @@ def task(action='list'):
       cur = db.session.execute("SELECT id FROM user WHERE nickname='{}'".format(nickname))
       try:
         user_id = cur.fetchone()[0]
-        cur = db.session.execute("SELECT taskname,body,timestamp,status FROM task WHERE id='{}' AND user_id='{}'".format(task_edited, user_id))
+        # Getting task by user and task id
+        cur = db.session.execute("SELECT taskname,body,timestamp,status,parent_id \
+                                  FROM task \
+                                  WHERE id='{}' AND user_id='{}'".format(task_edited, user_id))
         return render_template('task_modify.html', title=u'Задачи', user=nickname, task_edited=task_edited, task_expl=cur.fetchone())
       except TypeError: pass
       return render_template('task_modify.html', title=u'Задачи', user=nickname, task_edited=task_edited)
@@ -142,10 +154,24 @@ def task(action='list'):
       try:
         cur = db.session.execute("SELECT id FROM user WHERE nickname='{}'".format(nickname))
         user_id = cur.fetchone()[0]
-        db.session.query(Task).filter_by(id=request.form['taskid']).update({'taskname':request.form['taskname'], 'status':request.form['taskstatus'], 'body':request.form['taskbody']})
-        db.session.commit()
-        return redirect(url_for('task'))
       except TypeError: return redirect(url_for('do_login'))
+
+      parent_id = request.form['taskparent']
+      app.logger.info('### PARENT ID: '+str(parent_id)) # debug
+
+      cur = db.session.execute("SELECT depth FROM task WHERE id='{}'".format(parent_id))
+      parent_depth = cur.fetchone()[0]
+      app.logger.info('### PARENT DEPTH: '+str(parent_depth)) # debug
+      # parent_depth = 1
+
+      db.session.query(Task).filter_by(id=request.form['taskid']).update({
+                'taskname':request.form['taskname'],
+                'status':request.form['taskstatus'],
+                'body':request.form['taskbody'],
+                'parent_id':parent_id,
+                'depth':parent_depth+1 })
+      db.session.commit()
+      return redirect(url_for('task'))
 
   return 'Unresolved error 2'
 
@@ -340,7 +366,7 @@ def get_user_id():
   if logined_by_cookie():
     # refactoring
     user_id = request.cookies.get('id')
-    app.logger.info('Logined by cookies:\t'+str(user_id)) # debug
+    # app.logger.info('Logined by cookies:\t'+str(user_id)) # debug
     return int(user_id)
   else:
     return None
@@ -386,7 +412,7 @@ def logined_by_cookie():
     if not user_id == str('None'): # if user_id exist
       cur = db.session.execute("SELECT cookie FROM user WHERE id='{0}'".format(user_id))
       cookie = cur.fetchone()[0] # getting hash
-      app.logger.debug('Cookie from db:\t\t'+str(cookie)) # debug
+      # app.logger.debug('Cookie from db:\t\t'+str(cookie)) # debug
 
       if str(cookie) == str(user_hash):
         return True # yeah LOGINED
@@ -427,15 +453,25 @@ def id_generator(size=8, chars=string.ascii_uppercase + string.digits):
     return ''.join(random.choice(chars) for _ in range(size))
 
 def QuickSort(lst, parent_id, sorteded):
-  # app.logger.debug('LIST FOR SORTING:\n'+str(lst)) # debug
   sorted_list = sorteded
   for eid, taskname, date, parent, depth in lst:
     if parent == parent_id:
       element = {'id': eid, 'name': taskname, 'date': date, 'parent': parent, 'depth': depth}
       sorted_list.append(element)
       t = QuickSort(lst, eid, sorted_list)
-      app.logger.debug('PARENT:'+str(parent)+' CHILDS: '+str(t)) # debug
-      # sorted_list.append(t)
 
-  # app.logger.debug('LIST AFTER SORTING:\n'+str(sorted_list)) # debug
   return sorted_list
+
+def remove_microseconds(tasks):
+  tasks_short_date = []
+  for task in tasks:
+    tasks_short_date.append([task['id'],
+                             task['name'],
+                             task['date'].split(".")[0],
+                             task['parent'],
+                             task['depth']])
+
+  tasks = tasks_short_date
+  # for task in tasks:
+  #   app.logger.debug('Task preview:\t'+str(task)) # debug
+  return tasks

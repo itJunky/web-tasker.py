@@ -14,11 +14,16 @@
 	    <form action="" method="post"><div class="form-group">
 	    <table class="table">
 	      <input type="hidden" name="taskid" value="{{ task_edited }}" />
-	      <tr><td>Время</td><td>{{ task_expl[2] }}</td></tr>
-	      <tr><td>Название</td><td><input class="form-control well-sm" type='text' name="taskname" value="{{ task_expl[0] }}"></td></tr>
-	      <tr><td>Статус</td><td><input class="form-control well-sm" type='text' name="taskstatus" value="{{ task_expl[3] }}"></td></tr>
-	      <tr><td>Текст</td><td><textarea class="form-control well-lg" type='text' name="taskbody">{{ task_expl[1] }}</textarea></td></tr>
-	      <tr><td colspan=2><input class="btn btn-primary btn-block" type='submit' value='Изменить'></td></tr>
+	      <tr><td>Время</td><td>{{ task_expl[2] }}</td><td></td><td></td></tr>
+	      <tr><td>Название</td><td colspan="3"><input class="form-control well-sm" type='text' name="taskname" value="{{ task_expl[0] }}"></tr>
+	      <tr>
+          <td>Статус</td>
+          <td><input class="form-control well-sm" type='text' name="taskstatus" value="{{ task_expl[3] }}"></td>
+          <td>Родитель</td>
+          <td><input class="form-control well-sm" type='text' name="taskparent" value="{{ task_expl[4] }}"></td>
+        </tr>
+	      <tr><td>Текст</td><td colspan="3"><textarea class="form-control well-lg" type='text' name="taskbody">{{ task_expl[1] }}</textarea></td></tr>
+	      <tr><td colspan="4"><input class="btn btn-primary btn-block" type='submit' value='Изменить'></td><td></td><td></td></tr>
 	    </table>
 	    </div></form>
     {% else %}

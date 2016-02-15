@@ -23,10 +23,14 @@
       {% for task in task_list %}
       {# 0-id, 1-name, 2-date, 3-parent_id, 4 #}
       <tr>
-        <td><div class="tasklistelement panel-body">{{ task[0] }} {{ task[4] }}</div></td>
+        <td><div class="tasklistelement panel-body">{{ task[0] }} {{ task[3] }}</div></td>
         <td><div class="tasklistelement panel-body">
           {% for i in range(task[4]) %}
-            &nbsp;&nbsp;
+            {% if loop.first %}
+              &#8627;&nbsp;
+            {% else %}
+              &#8640;&nbsp;
+            {% endif %}
           {% endfor %}
           <a href="/task/view?id={{ task[0] }}">{{ task[1] }}</a></div></td>
         <td><div class="tasklistelement panel-body jumbotron">{{ task[2] }}</div></td>
