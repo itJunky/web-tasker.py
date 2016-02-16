@@ -98,7 +98,10 @@ def task(action='list'):
       user_id = cur.fetchone()[0]
       project_id = request.cookies.get('project_id')
       cur = db.session.execute("SELECT depth FROM task WHERE id='{}'".format(request.form['taskparent']))
-      parent_depth = cur.fetchone()[0]
+      try:
+        parent_depth = cur.fetchone()[0]
+      except TypeError:
+        parent_depth = -1
       # Example of sqlAlchemy usage
       task_row = Task(user_id=user_id,
                       project_id=project_id,
@@ -160,7 +163,10 @@ def task(action='list'):
       app.logger.info('### PARENT ID: '+str(parent_id)) # debug
 
       cur = db.session.execute("SELECT depth FROM task WHERE id='{}'".format(parent_id))
-      parent_depth = cur.fetchone()[0]
+      try:
+        parent_depth = cur.fetchone()[0]
+      except TypeError:
+        parent_depth = -1
       app.logger.info('### PARENT DEPTH: '+str(parent_depth)) # debug
       # parent_depth = 1
 
@@ -295,7 +301,7 @@ def do_login():
       user_id = int(get_user_id_from_db(user))
       app.logger.debug('Set cookies '+str(user)+' '+str(user_id)+' '+auth_hash) # debug
       
-      response = app.make_response(redirect(url_for('task')))
+      response = app.make_response(redirect(url_for('index')))
       response.set_cookie('id', value=str(user_id))
       response.set_cookie('hash', value=auth_hash)
       response.set_cookie('logged_at', value=str(datetime.now()))
@@ -326,23 +332,53 @@ def register_user():
     if mail_exist(request.form.get('email')):
       return 'mail exist'
     else:
-      # Prepare empty project for user
-      new_project = Project(name=u'Привет проект')
-      db.session.add(new_project)
-      db.session.commit()
       # Prepare user data to insert in db
       import crypt;
       salt = '$6$FIXEDS'
       pass_hash = crypt.crypt(request.form.get('password'), salt)
-      app.logger.info('Generated hash:\t'+pass_hash) # debug
       user_row = User(nickname=request.form.get('username'),
-  			                     email=request.form.get('email'), 
-                             password=request.form.get('password'),
-                             p_hash=pass_hash,
-                             role=ROLE_USER,
-                             register_date=datetime.now())
+                      email=request.form.get('email'), 
+                      password=request.form.get('password'),
+                      p_hash=pass_hash,
+                      role=ROLE_USER,
+                      register_date=datetime.now())
+      app.logger.info('Registered user:\n'+
+                      request.form.get('username')+'\n'+
+                      request.form.get('email')+'\n'+
+                      pass_hash+'\n') # debug
       db.session.add(user_row)
       db.session.commit()
+
+      # Getting id of new user for project owner
+      user_id = db.session.query(User.id).filter_by(email=request.form.get('email')).all()[0][0]
+      app.logger.info('NEW USER ID:\t'+str(user_id)) # debug
+      # Prepare empty project for user
+      new_project = Project(name=u'Добро пожаловать',
+                            status='Active',
+                            owner=user_id)
+      db.session.add(new_project)
+      db.session.commit()
+
+
+      # Getting Greet project id for assign task
+      new_project_id = db.session.query(Project.id).filter_by(name=u'Добро пожаловать').filter_by(owner=user_id).all()[0][0]
+      # Creating user association to project
+      new_assoc = Project_association(user_id=user_id, project_id=new_project_id)
+      db.session.add(new_assoc)
+      db.session.commit()
+
+      # Setting Greet task
+      task_row = Task(taskname=u"Это Ваша первая задача",
+                      parent_id=0,
+                      body=u"Вы можете создавать другие задачи в рамках проекта и делиться проектами с другими пользователями",
+                      timestamp=datetime.now(),
+                      user_id=user_id,
+                      project_id=new_project_id,
+                      status='Active',
+                      depth=0)
+      db.session.add(task_row)
+      db.session.commit()
+
       return redirect(url_for('index'))
 
   if request.method == 'GET':
