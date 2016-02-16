@@ -65,7 +65,7 @@ def task(action='list'):
                                   AND user_id='{}' \
                                   AND project_id='{}'".format(user_id, project_id))
       max_depth = cur.fetchone()[0]
-      if max_depth is None: return 'Not Your task',HTTP_403_FORBIDDEN
+      if max_depth is None: return render_template('task.html', title=u'Задачи', user=get_nick(), task_list=[], task_status=task_status)
       app.logger.debug('Max depth:\t'+str(max_depth)) # debug
       tasks = []
       # Get named list from db query
@@ -252,14 +252,20 @@ def project(action='list'):
 
   ### Edit Project ###
   elif action == 'edit':
+    project_id = request.args.get('id')
     if request.method == 'POST':
-      pass
+      project_name = request.form.get('projectname')
+      db.session.query(Project).filter_by(id=project_id).update({
+                'name':project_name,
+                'status':'Active',
+                'owner': user_id})
+      db.session.commit()
+      return redirect(url_for('project', action='list', project_id=project_id))
     else: # if GET request
       # Need:
       #       Project ID
       #       Project Name
       #       Project Users
-      project_id = request.args.get('id')
       project_name = db.session.query(Project.name).filter_by(id=project_id).all()[0]
       project_user_ids = db.session.query(Project_association.user_id).filter_by(project_id=project_id).all()
       project_user_names = []
@@ -358,7 +364,6 @@ def register_user():
                             owner=user_id)
       db.session.add(new_project)
       db.session.commit()
-
 
       # Getting Greet project id for assign task
       new_project_id = db.session.query(Project.id).filter_by(name=u'Добро пожаловать').filter_by(owner=user_id).all()[0][0]
