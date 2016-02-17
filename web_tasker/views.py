@@ -467,7 +467,9 @@ def get_user_id_from_db(username):
 
 
 def check_passwd(login, password):
-  db_hash = get_hash_from_db(login)[0]
+  try:
+    db_hash = get_hash_from_db(login)[0]
+  except TypeError: return 0
   if db_hash: # exist
     salt_end = db_hash.rindex('$')
     salt = db_hash[:salt_end]
