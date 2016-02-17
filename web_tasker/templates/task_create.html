@@ -18,7 +18,11 @@
         <td><textarea class="form-control well-lg" required type=text name=taskbody></textarea></td>
       </tr>
         <tr><td>Родительская задача №</td>
-        {% set parent_id = 0 %}
+        {% if parent %}
+          {% set parent_id = parent %}
+        {% else  %}
+          {% set parent_id = 0 %}
+        {% endif %}
         <td><input class="form-control well-lg" required type=text name=taskparent value="{{ parent_id }}"></td>
       </tr>
       <tr>
@@ -27,5 +31,5 @@
     </table>
     </form>
   </div>
-  {%  include "footer.html" %}
+  {% include "footer.html" %}
 {% endblock %}

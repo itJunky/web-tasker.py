@@ -36,14 +36,14 @@ def task(action='list'):
     user_id = get_user_id()
   # app.logger.info('Task viewing by user:\t'+str(user_id)) # debug
 
-  ### Showing task list
-  # Need:
-  #       User ID (upper)
-  #       Project ID
-  #       Project Name (SQL)
-  #       Parent ID (SQL)
-  #       Depth in tree (SQL)
   if action == 'list' or action == 'list_closed':
+    ### Showing task list
+    # Need:
+    #       User ID (upper)
+    #       Project ID
+    #       Project Name (SQL)
+    #       Parent ID (SQL)
+    #       Depth in tree (SQL)
     project_id = request.args.get('project_id')
     app.logger.info('Project ID is:\t'+str(project_id)) # debug
     if project_id == None: # if no id in form try cookie, because it from last session
@@ -92,6 +92,10 @@ def task(action='list'):
 
   ### Creating task
   elif action=='create':
+    parent_id = request.args.get('taskparent')
+    if parent_id is None:
+      parent_id = request.form['taskparent']
+    app.logger.info('PARENT TASK ID:\t'+str(parent_id)) # debug     
     if request.method == 'POST':
       # Getting user id
       cur = db.session.execute("SELECT id FROM user WHERE nickname='{}'".format(get_nick()))
@@ -102,19 +106,20 @@ def task(action='list'):
         parent_depth = cur.fetchone()[0]
       except TypeError:
         parent_depth = -1
+
       # Example of sqlAlchemy usage
       task_row = Task(user_id=user_id,
                       project_id=project_id,
                       taskname=request.form['taskname'],
                       body=request.form['taskbody'],
-                      parent_id=request.form['taskparent'],
+                      parent_id=parent_id,
                       timestamp=datetime.now(),
                       depth=int(parent_depth)+1,
                       status='Active')
       db.session.add(task_row)
       db.session.commit()
       return redirect(url_for('task', action='list', project_id=project_id))
-    return render_template('task_create.html', title=u'Задачи', user=get_nick())
+    return render_template('task_create.html', title=u'Задачи', user=get_nick(), parent=parent_id)
 
   ### Explain task 
   elif action=='view':
