@@ -1,0 +1,40 @@
+
+    {% extends "head.html" %}
+    {% block content %}
+      
+    <div class="page-header">
+      <h1>Личная карточка {{ user }}</h1>
+    </div>
+      {% include "localmenu.html" %}
+      {% include "menu.html" %}
+    </div> {# id="header" #}
+    <div id="content" class="well-sm container panel-group index">
+      <form action="" method="post"><div class="form-group">
+      <table class="table">
+        <tr>
+          <td>Новый пароль</td>
+          <td><input class="form-control well-sm" type='password' name="new_pass"></td>
+        </tr>
+        <tr>
+          <td>Пользователь</td><td>{{ user }}</td>
+        </tr>
+        <tr>
+          <td>Почта </td>
+          <td><input class="form-control well-sm" type='text' name="email" value="{{ mail }}"></td>
+        </tr>
+        <tr>
+          <td>Текущий пароль (Для подтверждения)</td>
+          <td><input class="form-control well-sm" type='password' name="orig_pass"></td>
+        </tr>
+        <tr>
+          <td colspan="3">
+            <input class="btn btn-primary btn-block" type='submit' value='Изменить'>
+          </td>
+        </tr>
+      </table>  
+      </form>
+    </div>
+  </div>
+  {% include "footer.html" %}
+</div> {# id="wrapper" #}
+{% endblock %}

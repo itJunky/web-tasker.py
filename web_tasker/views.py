@@ -179,7 +179,7 @@ def task(action='list'):
       db.session.commit()
       return redirect(url_for('task'))
 
-  return 'Unresolved error 2'
+  return 'Unresolved error 2 in task'
 
 
 @app.route("/comment_to_task", methods=['POST'])
@@ -280,14 +280,51 @@ def project(action='list'):
       project_full_data = [project_id, project_name[0], project_user_ids, project_user_names]
       return render_template('project_edit.html', title=u'Проекты', user=get_nick(), project=project_full_data)
 
-
 @app.route("/profile")
 def profile():
   if not logined_by_cookie():
     return redirect(url_for('do_login')) # if not logined go to login
   else:
-    return render_template('profile.html', user=get_nick())
-    
+    username = get_nick()
+    user_id = request.cookies.get('id') 
+    email = db.session.query(User.email).filter_by(id=user_id).one()[0]
+    return render_template('profile.html', user=username, mail=email)
+
+@app.route("/profile/edit", methods=['GET', 'POST'])
+def profile_edit():
+  if not logined_by_cookie():
+    return redirect(url_for('do_login')) # if not logined go to login
+  else:
+    user_id = request.cookies.get('id')
+    username = str(get_nick())+' '+str(user_id)
+    email = db.session.query(User.email).filter_by(id=user_id).one()[0]
+    if request.method == 'GET':
+      return render_template('profile_edit.html', user=username, mail=email)
+    elif request.method == 'POST':
+      original_password = request.form.get('orig_pass')
+      from crypt import crypt;
+      salt = '$6$FIXEDS'
+      pass_hash = crypt(original_password, salt)
+      hash_from_db = db.session.query(User.p_hash).filter_by(id=user_id).one()[0]
+      app.logger.debug('Passwords:\n'+str(pass_hash)+'\n'+str(hash_from_db)) # debug
+      if pass_hash == hash_from_db:
+        mail = request.form.get('email')
+        new_password = request.form.get('new_pass')
+        if new_password is None:
+          db.session.query(User).filter_by(id=user_id).update({'email': mail})
+          db.session.commit()
+        else: #update pass
+          salt = '$6$FIXEDS'
+          pass_hash = crypt(new_password, salt)
+          db.session.query(User).filter_by(id=user_id).update({
+                          'email': mail,
+                          'p_hash': pass_hash,
+                          'password': original_password})
+          db.session.commit()
+          app.logger.debug('SETTING Password:\n'+str(pass_hash)) # debug
+      else: return "wrong password"
+
+      return render_template('profile.html', user=username, mail=email)
 
 @app.route("/about")
 def about():
@@ -366,7 +403,7 @@ def register_user():
       db.session.commit()
 
       # Getting Greet project id for assign task
-      new_project_id = db.session.query(Project.id).filter_by(name=u'Добро пожаловать').filter_by(owner=user_id).all()[0][0]
+      new_project_id = db.session.query(Project.id).filter_by(name=u'Добро пожаловать', owner=user_id).all()[0][0]
       # Creating user association to project
       new_assoc = Project_association(user_id=user_id, project_id=new_project_id)
       db.session.add(new_assoc)

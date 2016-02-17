@@ -1,16 +1,18 @@
 
-	{% extends "head.html" %}
-	{% block content %}
-	  
-	  <div class="page-header">
-	  	<h1>Личная карточка {{ user }}</h1>
-	  </div>
-	  {% include "localmenu.html" %}
-	  {% include "menu.html" %}
-	</div> {# id="header" #}
-	  <div id="content" class="index navbar navbar-fixed-top well-sm">
-	    Пользователь
-	  </div>
-	  {%  include "footer.html" %}
-	{% endblock %}
+    {% extends "head.html" %}
+    {% block content %}
+
+    <div class="page-header">
+      <h1>Личная карточка {{ user }}</h1>
+    </div>
+      {% include "localmenu.html" %}
+      {% include "menu.html" %}
+    </div> {# id="header" #}
+    <div id="content" class="well-sm container panel-group index">
+        Пользователь {{ user }}</br>
+        Почта {{ mail }}</br>
+        <a href="/profile/edit">Сменить пароль</a>
+    </div>
+    {%  include "footer.html" %}
 </div> {# id="wrapper" #}
+{% endblock %}
