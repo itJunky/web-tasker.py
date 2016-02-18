@@ -1,4 +1,4 @@
-.mainmenu {
+.mainmenubar {
     width: 140px;
     background: #ddd;
     padding: 5px;
@@ -10,8 +10,15 @@
     box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
 }
 
+#mainmenu {
+    padding: 0;
+    margin: 0;
+    line-height: 0;
+}
+
 .mainmenuline {
-    margin-top: -15%;
+    display: inline-block;
+    line-height: 5px;
 }
 
 .mycontent {

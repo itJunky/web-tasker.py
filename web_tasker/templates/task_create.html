@@ -20,7 +20,7 @@
         <tr><td>Родительская задача №</td>
         {% if parent %}
           {% set parent_id = parent %}
-        {% else  %}
+        {% else %}
           {% set parent_id = 0 %}
         {% endif %}
         <td><input class="form-control well-lg" required type=text name=taskparent value="{{ parent_id }}"></td>
