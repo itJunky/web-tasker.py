@@ -3,7 +3,7 @@
     <label class="navbar-brand">Задачи</label>
   </div>
   <ul class="nav navbar-nav taskmenu-elem">
-    <li><a href='/task/create'>Создать другую задачу</a></li>
+    <li><a href='/task/create?taskparent=0'>Создать другую задачу</a></li>
       {% if task_opened %}
       {# если внутри задачи #}
         <li><a href='/task/edit?id={{ task_opened }}'>Изменить задачу</a></li>
