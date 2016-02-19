@@ -51,6 +51,11 @@ def task(action='list'):
       if project_id == None: # if no id in cookie, get least of all user's projects
         project_id = get_first_project_id(user_id)
 
+    # Check access to project
+    try:
+      check_up = db.session.query(Project_association.id).filter_by(project_id=project_id, user_id=user_id).one()
+    except: return "Wrong project ID"
+
     # rewrite to sqlalchemy like User.query.all() or User.query.filter() like in edit section
     # http://flask.pocoo.org/docs/0.10/patterns/sqlalchemy/
     if action == 'list_closed':
@@ -62,8 +67,7 @@ def task(action='list'):
       cur = db.session.execute("SELECT MAX(depth) \
                                 FROM task \
                                 WHERE status!='Disabled' \
-                                  AND user_id='{}' \
-                                  AND project_id='{}'".format(user_id, project_id))
+                                  AND project_id='{}'".format(project_id))
       max_depth = cur.fetchone()[0]
       if max_depth is None: return render_template('task.html', title=u'Задачи', user=get_nick(), task_list=[], task_status=task_status)
       app.logger.debug('Max depth:\t'+str(max_depth)) # debug
@@ -74,8 +78,7 @@ def task(action='list'):
                                   FROM task \
                                   WHERE status!='Disabled' \
                                     AND depth='{}' \
-                                    AND user_id='{}' \
-                                    AND project_id='{}'".format(depth, user_id, project_id))
+                                    AND project_id='{}'".format(depth, project_id))
         tasks_tmp = cur.fetchall()
         for t in tasks_tmp:
           tasks.append(t)
@@ -93,9 +96,14 @@ def task(action='list'):
   ### Creating task
   elif action=='create':
     parent_id = request.args.get('taskparent')
+    app.logger.info('PARENT TASK ID from args:\t'+str(parent_id)) # debug
     if parent_id is None:
       parent_id = request.form['taskparent']
-    app.logger.info('PARENT TASK ID:\t'+str(parent_id)) # debug     
+      app.logger.info('PARENT TASK ID from form:\t'+str(parent_id)) # debug
+      if parent_id is None: 
+        parent_id = 0
+        app.logger.info('PARENT TASK ID is ZERO:\t'+str(parent_id)) # debug     
+
     if request.method == 'POST':
       # Getting user id
       cur = db.session.execute("SELECT id FROM user WHERE nickname='{}'".format(get_nick()))
@@ -221,11 +229,13 @@ def project(action='list'):
     app.logger.debug('project_ids: '+str(project_ids)) # debug
     if project_ids:
       projects = []
+      project_users = []
       for project_id in project_ids:
         project_name = db.session.query(Project.name).filter_by(id=project_id[0]).all()[0]
         projects.append([project_id[0], project_name[0]])
-        # app.logger.debug('project_id is: '+str(project_id[0])+' name is '+str(project_name)) # debug
-    return render_template('project.html', title=u'Проекты', user=get_nick(), project_list=projects, project_status=project_status)
+        project_users = db.session.query(Project_association.user_id).filter_by(project_id=project_id[0]).all()
+        app.logger.debug('project_users is: '+str(project_users)) # debug
+    return render_template('project.html', title=u'Проекты', user=get_nick(), project_list=projects, project_status=project_status, project_users=project_users)
 
   ### Create new Project ###
   elif action == 'create':
@@ -293,7 +303,7 @@ def profile():
     username = get_nick()
     user_id = request.cookies.get('id') 
     email = db.session.query(User.email).filter_by(id=user_id).one()[0]
-    return render_template('profile.html', user=username, mail=email)
+    return render_template('profile.html', user=username, mail=email, user_id=user_id)
 
 @app.route("/profile/edit", methods=['GET', 'POST'])
 def profile_edit():
