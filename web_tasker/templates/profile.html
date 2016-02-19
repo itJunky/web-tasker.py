@@ -8,10 +8,21 @@
       {% include "localmenu.html" %}
       {% include "menu.html" %}
     </div> {# id="header" #}
-    <div id="content" class="well-sm container panel-group index">
-        Пользователь {{ user }}</br>
-        Почта {{ mail }}</br>
-        <a href="/profile/edit">Сменить пароль</a>
+    <div id="content" class="well-sm container panel-group login_form">
+      <table class="table">
+        <tr>
+          <td>Пользователь</td><td>{{ user }}</td>
+        </tr>
+        <tr>
+          <td>Идентификатор</td><td>{{ user_id }}</td>
+        </tr>
+        <tr>
+          <td>Почта</td><td>{{ mail }}</td>
+        </tr>
+        <tr>
+          <td colspan="2"><a href="/profile/edit">Сменить пароль</a></td>
+        </tr>
+      </table>
     </div>
     {%  include "footer.html" %}
 </div> {# id="wrapper" #}
