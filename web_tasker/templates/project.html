@@ -25,7 +25,12 @@
       <tr>
         <td><div class="tasklistelement panel-body">{{ project[0] }}</div></td>
         <td><div class="tasklistelement panel-body"><a href="/project/view?id={{ project[0] }}">{{ project[1] }}</a></td>
-        <td><div class="tasklistelement panel-body jumbotron">{{ project[2] }}</div></td>
+        <td>
+          <div class="tasklistelement panel-body jumbotron">
+            {% for name in project_users[loop.index-1] %}
+              {{ name }}
+            {% endfor %}
+          </div></td>
         <td><div class="tasklistelement panel-body"><a href="/project/edit?id={{ project[0] }}">Изменить</a></div></td>
       </tr>
       {% endfor %}

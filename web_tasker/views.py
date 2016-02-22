@@ -233,8 +233,15 @@ def project(action='list'):
       for project_id in project_ids:
         project_name = db.session.query(Project.name).filter_by(id=project_id[0]).all()[0]
         projects.append([project_id[0], project_name[0]])
-        project_users = db.session.query(Project_association.user_id).filter_by(project_id=project_id[0]).all()
-        app.logger.debug('project_users is: '+str(project_users)) # debug
+        project_user_ids = db.session.query(Project_association.user_id).filter_by(project_id=project_id[0]).all()
+        project_user_names = []
+        for user_id in project_user_ids:
+          name = db.session.query(User.nickname).filter_by(id=user_id[0]).all()[0]
+          project_user_names.append(name[0])
+
+        project_users.append(project_user_names)
+
+        app.logger.debug('project_users is: '+str(project_user_names)) # debug
     return render_template('project.html', title=u'Проекты', user=get_nick(), project_list=projects, project_status=project_status, project_users=project_users)
 
   ### Create new Project ###
