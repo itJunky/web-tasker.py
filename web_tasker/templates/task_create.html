@@ -11,7 +11,7 @@
     <table class="table">
       <tr>
         <td width="10%">Имя</td>
-        <td><input class="form-control well-lg" required type=text name=taskname> </td>
+        <td><input class="form-control well-lg" required type=text name=taskname id=editfield> </td>
       </tr>
       <tr>
         <td>Текст</td>
@@ -23,7 +23,7 @@
         {% else %}
           {% set parent_id = 0 %}
         {% endif %}
-        <td><input class="form-control well-lg" required type=text name=taskparent value="{{ parent_id }}"></td>
+        <td><input class="form-control well-lg" required type=text name=taskparent id=editfield value="{{ parent_id }}"></td>
       </tr>
       <tr>
         <td colspan="2"><input class="btn btn-primary btn-block" type=submit value='Отправить'></td>

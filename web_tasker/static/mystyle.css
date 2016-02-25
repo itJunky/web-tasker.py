@@ -76,6 +76,11 @@
     margin-right: 80%;
 }
 
+#editfield {
+    padding: 10px;
+    margin: 0;
+}
+
 .task_name {
     width: 400px;
     font-family: monospace;
