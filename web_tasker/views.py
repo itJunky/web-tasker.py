@@ -137,8 +137,15 @@ def task(action='list'):
     cur = db.session.execute("SELECT id FROM user WHERE nickname='{}'".format(nickname))
     try: # if logined
       user_id = cur.fetchone()[0]
-      task_explained = db.session.execute("SELECT taskname,body,timestamp FROM task WHERE id='{}' AND user_id='{}'".format(task_id, user_id))
-      all_comments = db.session.execute("SELECT c.id,c.user_id,c.timestamp,c.text,u.nickname FROM comment c, user u WHERE c.task_id='{}' and c.user_id=u.id".format(task_id))
+      # check access to current project
+      project_id = db.session.execute("SELECT project_id FROM task WHERE id='{}'".format(task_id)).fetchone()[0]
+      permit_to_project = db.session.execute("SELECT id FROM project_association WHERE project_id='{}' AND user_id='{}'".format(project_id, user_id)).fetchone()[0]
+      if permit_to_project:
+        task_explained = db.session.execute("SELECT taskname,body,timestamp FROM task WHERE id='{}'".format(task_id))
+        all_comments = db.session.execute("SELECT c.id,c.user_id,c.timestamp,c.text,u.nickname FROM comment c, user u WHERE c.task_id='{}'".format(task_id))
+      else:
+        return "Access to this task is denied for you"
+        
       #all_comments = db.session.query(Comment).filter_by(task_id=task_id).all()
       app.logger.debug('### End viewing ###')
       # may be need redirect to internal func here
@@ -215,7 +222,7 @@ def project(action='list'):
   else:
     user_id = get_user_id()
 
-  app.logger.info(' ### Project logined user ID:\t'+str(user_id)) # debug
+  # app.logger.info(' ### Project logined user ID:\t'+str(user_id)) # debug
 
   ### Show Project List ###
   if action == 'list' or action == 'list_closed':
@@ -226,7 +233,7 @@ def project(action='list'):
       project_status = True
       project_ids = get_projects_for_user(user_id, 'Active')
 
-    app.logger.debug('project_ids: '+str(project_ids)) # debug
+    # app.logger.debug('project_ids: '+str(project_ids)) # debug
     if project_ids:
       projects = []
       project_users = []
@@ -241,7 +248,7 @@ def project(action='list'):
 
         project_users.append(project_user_names)
 
-        app.logger.debug('project_users is: '+str(project_user_names)) # debug
+        # app.logger.debug('project_users is: '+str(project_user_names)) # debug
     return render_template('project.html', title=u'Проекты', user=get_nick(), project_list=projects, project_status=project_status, project_users=project_users)
 
   ### Create new Project ###
@@ -277,6 +284,22 @@ def project(action='list'):
     project_id = request.args.get('id')
     if request.method == 'POST':
       project_name = request.form.get('projectname')
+      need_add_user = request.form.getlist('addusertoggle')
+      if need_add_user:
+        user_to_add = request.form.get('adduser')
+        try:
+          userid_to_add = db.session.query(User.id).filter_by(nickname=user_to_add).first()[0]
+          db.session.add(Project_association(user_id=userid_to_add, project_id=project_id))
+          db.session.commit()
+          app.logger.info('User existed')
+          app.logger.info('Checkbox is: Checked\n'+str(user_to_add)+'\n'+str(userid_to_add))
+        except:
+          app.logger.info('User doesn\'t exist')
+          return "Error: User doesn't exist"
+
+      else:
+        app.logger.info('Checkbox is: Unchecked\n Not need to add user\n'+str(need_add_user))
+
       db.session.query(Project).filter_by(id=project_id).update({
                 'name':project_name,
                 'status':'Active',
