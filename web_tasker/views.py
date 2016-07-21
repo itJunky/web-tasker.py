@@ -29,12 +29,12 @@ def index():
 @app.route("/task")
 @app.route("/task/<action>", methods=['GET', 'POST'])
 def task(action='list'):
-  if not logined_by_cookie():
+  try:
+    user_id = get_user_id()
+    app.logger.info('Task viewing by user:\t'+str(user_id)) # debug
+  except:
     app.logger.error('Not logined') # debug
     return redirect(url_for('do_login')) # if not logined go to login
-  else:
-    user_id = get_user_id()
-  # app.logger.info('Task viewing by user:\t'+str(user_id)) # debug
 
   if action == 'list' or action == 'list_closed':
     ### Showing task list
@@ -133,7 +133,10 @@ def task(action='list'):
   elif action=='view':
     task_id = request.args.get('id')
     app.logger.debug('### Start viewing {} ###'.format(task_id))
+    
     nickname = get_nick()
+    if nickname == 'None': return redirect(url_for('do_login')) # if not logined go to login
+
     cur = db.session.execute("SELECT id FROM user WHERE nickname='{}'".format(nickname))
     try: # if logined
       user_id = cur.fetchone()[0]
@@ -145,7 +148,7 @@ def task(action='list'):
         all_comments = db.session.execute("SELECT c.id,c.user_id,c.timestamp,c.text,u.nickname FROM comment c, user u WHERE c.task_id='{}'".format(task_id))
       else:
         return "Access to this task is denied for you"
-        
+
       #all_comments = db.session.query(Comment).filter_by(task_id=task_id).all()
       app.logger.debug('### End viewing ###')
       # may be need redirect to internal func here
@@ -532,7 +535,7 @@ def logined_by_cookie():
   user_id = str(request.cookies.get('id'))
   user_hash = request.cookies.get('hash')
   if user_hash:
-    app.logger.debug('UserID from cookie:\t'+user_id+' '+user_hash) # debug
+    app.logger.info('Check UserID from cookie:\t'+user_id+' '+user_hash) # debug
 
     if not user_id == str('None'): # if user_id exist
       cur = db.session.execute("SELECT cookie FROM user WHERE id='{0}'".format(user_id))
