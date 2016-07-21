@@ -31,7 +31,7 @@ def index():
 def task(action='list'):
   try:
     user_id = get_user_id()
-    app.logger.info('Task viewing by user:\t'+str(user_id)) # debug
+    app.logger.info('Some task viewing by user:\t'+str(user_id)) # debug
   except:
     app.logger.error('Not logined') # debug
     return redirect(url_for('do_login')) # if not logined go to login
@@ -132,33 +132,41 @@ def task(action='list'):
   ### Explain task 
   elif action=='view':
     task_id = request.args.get('id')
-    app.logger.debug('### Start viewing {} ###'.format(task_id))
+    app.logger.debug('### Start viewing task id: {} ###'.format(task_id))
     
-    nickname = get_nick()
-    if nickname == 'None': return redirect(url_for('do_login')) # if not logined go to login
-
-    cur = db.session.execute("SELECT id FROM user WHERE nickname='{}'".format(nickname))
-    try: # if logined
-      user_id = cur.fetchone()[0]
-      # check access to current project
-      project_id = db.session.execute("SELECT project_id FROM task WHERE id='{}'".format(task_id)).fetchone()[0]
-      permit_to_project = db.session.execute("SELECT id FROM project_association WHERE project_id='{}' AND user_id='{}'".format(project_id, user_id)).fetchone()[0]
-      if permit_to_project:
-        task_explained = db.session.execute("SELECT taskname,body,timestamp FROM task WHERE id='{}'".format(task_id))
-        all_comments = db.session.execute("SELECT c.id,c.user_id,c.timestamp,c.text,u.nickname FROM comment c, user u WHERE c.task_id='{}'".format(task_id))
-      else:
-        return "Access to this task is denied for you"
-
-      #all_comments = db.session.query(Comment).filter_by(task_id=task_id).all()
-      app.logger.debug('### End viewing ###')
-      # may be need redirect to internal func here
-      return render_template('task_view.html', title=u'Задачи', user=nickname,
-                              task_expl=task_explained.fetchone(), task_opened=task_id,
-                              comments=all_comments.fetchall())
-    except TypeError: # if not logined go to login
-      return redirect(url_for('do_login'))
+    try:
+      nickname = get_nick()
+    except:
+      app.logger.debug('Nick is wrong: ' + nickname)
+      return "error", 500
+      # return redirect(url_for('do_login')) # if not logined go to login
     else:
-      return 'Unresolved error'
+      app.logger.debug('Nick is ok: ' + nickname)
+
+    try: # if logined
+      user_id = db.session.execute("SELECT id FROM user WHERE nickname='{}'".format(nickname)).fetchone()[0]
+      app.logger.debug('UserID is: ' + str(user_id))
+    except TypeError: # if not logined go to login
+      app.logger.debug("Login is wrong")
+      return redirect(url_for('do_login'))
+
+    # check access to current project
+    project_id = db.session.execute("SELECT project_id FROM task WHERE id='{}'".format(task_id)).fetchone()[0]
+    permit_to_project = db.session.execute("SELECT id FROM project_association WHERE project_id='{}' AND user_id='{}'".format(project_id, user_id)).fetchone()[0]
+    if permit_to_project:
+      task_explained = db.session.execute("SELECT taskname,body,timestamp FROM task WHERE id='{}'".format(task_id))
+      # all_comments = db.session.execute("SELECT c.id,c.user_id,c.timestamp,c.text,u.nickname FROM comment c, user u WHERE c.task_id='{}' AND u.id='{}'".format(task_id))
+      all_comments = db.session.execute("SELECT id,user_id,timestamp,text FROM comment c WHERE task_id='{}'".format(task_id)).fetchall()
+      all_comments = convert_id_to_nick(all_comments)
+    else:
+      return "Access to this task is denied for you"
+
+    #all_comments = db.session.query(Comment).filter_by(task_id=task_id).all()
+    app.logger.debug('### End viewing ###')
+    # may be need redirect to internal func here
+    return render_template('task_view.html', title=u'Задачи', user=nickname,
+                            task_expl=task_explained.fetchone(), task_opened=task_id,
+                            comments=all_comments)
 
   ### Edit task
   elif action=='edit':
@@ -207,8 +215,14 @@ def task(action='list'):
 
 @app.route("/comment_to_task", methods=['POST'])
 def post_comment_to_task():
-  app.logger.info('### Post Comment to db ###') # debug
-  new_comment = Comment(user_id=get_user_id(), task_id=request.form['taskid'], timestamp=datetime.now(), text=request.form.get('commenttext'))
+  user_id = get_user_id()
+  task_id = request.form['taskid']
+  text = request.form.get('commenttext')
+  new_comment = Comment(user_id=user_id, task_id=task_id, timestamp=datetime.now(), text=text)
+  app.logger.info('### Post Comment to db ###\n'+
+                  'For user: '+str(user_id)+' and Task ID: '+task_id+'\n'+
+                  'With text: '+text+'\n'+
+                  'Resulted request: '+str(new_comment)) # debug
   db.session.add(new_comment)
   db.session.commit()
   return redirect(url_for('task', action='view', id=int(request.form['taskid'])))
@@ -219,13 +233,13 @@ def post_comment_to_task():
 @app.route("/project")
 @app.route("/project/<action>", methods=['GET', 'POST'])
 def project(action='list'):
-  if not logined_by_cookie():
+  try:
+    user_id = get_user_id()
+    app.logger.info(' ### Project logined user ID:\t'+str(user_id)) # debug
+  except:
     app.logger.error('Not logined') # debug
     return redirect(url_for('do_login')) # if not logined go to login
-  else:
-    user_id = get_user_id()
 
-  # app.logger.info(' ### Project logined user ID:\t'+str(user_id)) # debug
 
   ### Show Project List ###
   if action == 'list' or action == 'list_closed':
@@ -556,6 +570,17 @@ def get_nick():
 
   return None
 
+def convert_id_to_nick(comments):
+  result = list()
+  app.logger.debug("### START Convert IDs to Nicks ###\nSource data:\n"+str(comments)) #debug
+  for comment in comments:
+    nick = db.session.query("nickname FROM user WHERE id='{}'".format(comment[1])).first()[0]
+    converted_comment = (comment[0], comment[1], comment[2], comment[3], nick)
+    app.logger.debug("### Convert IDs to Nicks ###\n"+str(converted_comment)+"\n"+str(comment)) #debug
+    result.append(converted_comment)
+
+  app.logger.debug("Converted result: "+str(result))
+  return result
 
 def get_hash_from_db(username):
   cur = db.session.execute("SELECT p_hash FROM user WHERE nickname='{0}'".format(username))
