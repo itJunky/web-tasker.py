@@ -36,6 +36,7 @@ def task(action='list'):
     app.logger.error('Not logined') # debug
     return redirect(url_for('do_login')) # if not logined go to login
 
+  ### Show task list
   if action == 'list' or action == 'list_closed':
     ### Showing task list
     # Need:
@@ -48,7 +49,9 @@ def task(action='list'):
     app.logger.info('Project ID is:\t'+str(project_id)) # debug
     if project_id == None: # if no id in form try cookie, because it from last session
       project_id = request.cookies.get('project_id')
+      app.logger.debug("!!! TRYING TO GET PROJECT ID !!!\nFrom cookie: "+str(project_id))
       if project_id == None: # if no id in cookie, get least of all user's projects
+        app.logger.debug("!!! TRYING TO GET PROJECT ID !!!\nFirst from all: "+str(project_id))
         project_id = get_first_project_id(user_id)
 
     # Check access to project
@@ -236,6 +239,7 @@ def project(action='list'):
   try:
     user_id = get_user_id()
     app.logger.info(' ### Project logined user ID:\t'+str(user_id)) # debug
+    if user_id == None: return redirect(url_for('do_login')) # if not logined go to login
   except:
     app.logger.error('Not logined') # debug
     return redirect(url_for('do_login')) # if not logined go to login
@@ -396,8 +400,11 @@ def about():
 @app.route("/login", methods=['GET', 'POST'])
 def do_login():
   if request.method == 'POST':
-    user = str(request.form['username'])
-    password = str(request.form['password'])
+    try:
+      user = str(request.form['username'])
+      password = str(request.form['password'])
+    except UnicodeEncodeError:
+      return "Wrong login or password charset"
     
     #app.logger.info('Check password:\t'+str(check_passwd(user, password))) # debug
     if check_passwd(user, password):
@@ -422,14 +429,12 @@ def do_login():
   # if request.method == GET
   return render_template('login.html', user=None)
 
-
 @app.route("/logout")
 def logout():
   response = app.make_response(redirect(url_for('index')))
   response.set_cookie('id', value=' ', expires=1)
   response.set_cookie('pass', value=' ', expires=1)
   return response
-
 
 @app.route("/register", methods=['GET', 'POST'])
 def register_user():
@@ -488,7 +493,6 @@ def register_user():
   if request.method == 'GET':
     return render_template('register.html', user=None)
 
-
 @app.route("/users")
 def users_list():
   if not logined_by_cookie():
@@ -511,7 +515,6 @@ def get_user_id():
   else:
     return None
 
-
 def mail_exist(email):
   cur = db.session.execute("SELECT email FROM user")
   all_emails = cur.fetchall()
@@ -522,11 +525,9 @@ def mail_exist(email):
     app.logger.info('### Email doesn\'t exist in database ###') # debug
     return False
 
-
 def get_user_id_from_db(username):
     cur = db.session.execute("SELECT id FROM user WHERE nickname='{0}'".format(str(username)))
     return cur.fetchone()[0]
-
 
 def check_passwd(login, password):
   try:
@@ -544,7 +545,6 @@ def check_passwd(login, password):
   else:
     return 0 # p_hash doesn't exist
 
-
 def logined_by_cookie():
   user_id = str(request.cookies.get('id'))
   user_hash = request.cookies.get('hash')
@@ -560,7 +560,6 @@ def logined_by_cookie():
         return True # yeah LOGINED
     
   return False
-
 
 def get_nick():
   user_id = request.cookies.get('id')
@@ -593,12 +592,14 @@ def get_projects_for_user(user_id, status='Active'):
     project_ids = cur.fetchall()[0]
   else:
     project_status = True
-    project_ids = db.session.query(Project_association.project_id).filter_by(user_id=user_id)
+    project_ids = db.session.query(Project_association.project_id).filter_by(user_id=user_id).all()
 
   return project_ids
 
 def get_first_project_id(user_id):
-  return 1
+  p = get_projects_for_user(user_id)[0][0]
+  app.logger.debug("Projects for this user: "+str(p))
+  return p
 
 import string
 def id_generator(size=8, chars=string.ascii_uppercase + string.digits):
