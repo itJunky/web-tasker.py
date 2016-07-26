@@ -215,7 +215,6 @@ def task(action='list'):
 
   return 'Unresolved error 2 in task'
 
-
 @app.route("/comment_to_task", methods=['POST'])
 def post_comment_to_task():
   user_id = get_user_id()
@@ -238,7 +237,7 @@ def post_comment_to_task():
 def project(action='list'):
   try:
     user_id = get_user_id()
-    app.logger.info(' ### Project logined user ID:\t'+str(user_id)) # debug
+    app.logger.info(' ### Project | logined user ID:\t'+str(user_id)) # debug
     if user_id == None: return redirect(url_for('do_login')) # if not logined go to login
   except:
     app.logger.error('Not logined') # debug
@@ -333,18 +332,31 @@ def project(action='list'):
       #       Project Name
       #       Project Users
       project_name = db.session.query(Project.name).filter_by(id=project_id).all()[0]
-      project_user_ids = db.session.query(Project_association.user_id).filter_by(project_id=project_id).all()
+      project_user_ids = db.session.query(Project_association.user_id).filter_by(project_id=project_id).values('user_id')
+
       project_user_names = []
+      user_ids = []
       for user_id in project_user_ids:
         name = db.session.query(User.nickname).filter_by(id=user_id[0]).all()[0]
         project_user_names.append(name[0])
+        user_ids.append(user_id[0])
 
+      project_user_ids = user_ids
       app.logger.debug('### Project # Edit ### id from form: '+str(project_id[0])+'\n'+ \
-                        'Name: '+str(project_name)+'\n'+ \
+                        'Name: '+str(project_name[0])+'\n'+ \
                         'User IDs: '+str(project_user_ids)+'\n'+ \
-                        'Users in project: '+str(project_user_names) ) # debug
+                        'Users in project: '+str(type(project_user_names)) ) # debug
       project_full_data = [project_id, project_name[0], project_user_ids, project_user_names]
       return render_template('project_edit.html', title=u'Проекты', user=get_nick(), project=project_full_data)
+
+  ### Remove user from Project
+  elif action == 'rmuser':
+    project_id = str(request.cookies.get('project_id'))
+    userid_to_del = str(request.args.get('id'))
+    cur = db.session.query(Project_association).filter_by(user_id=userid_to_del).filter_by(project_id=project_id).delete()
+    db.session.commit()
+    app.logger.debug("### Trying to delete user: "+str(userid_to_del)+"\nFrom project: "+project_id+"\n"+str(cur))
+    return redirect(url_for('project', action='edit', id=project_id))
 
 @app.route("/profile")
 def profile():
@@ -395,7 +407,6 @@ def profile_edit():
 @app.route("/about")
 def about():
     return render_template('about.html', title=u'О сайте')
-
 
 @app.route("/login", methods=['GET', 'POST'])
 def do_login():

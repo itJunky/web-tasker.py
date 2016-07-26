@@ -18,18 +18,19 @@
           <td>Список пользователей</td>
           <td>
             <ul class="list-inline">
-              <!-- <a href="/project/adduser?id=">+</a> -->
+              {% for user in project[3] %}
+                <li>
+                  <div class="well well-sm">
+                    <a href='/project/rmuser?id={{ project[2][loop.index-1] }}' alt='Удалить пользователя'>-</a>
+                    {{ user }}
+                  </div>
+                </li>
+              {% endfor %}
+              <br>
               <input type="checkbox" id="adduser" name="addusertoggle" value="1">Добавить пользователя в проект</input>
               <div id="dinamic-form" style="display: none; width: 20%;">
                 <input class="form-control" type="text" name="adduser">
               </div><br>
-              {% for user in project[3] %}
-                <li>
-                <div class="well well-sm">
-                  {{ user }} <a href='/project/rmuser?id={{ project[2][loop.index] }}' alt='Удалить пользователя'>-</a>
-                </div>
-                </li>
-              {% endfor %}
             </ul>
           </td>
         </tr>
