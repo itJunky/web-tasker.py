@@ -158,13 +158,11 @@ def task(action='list'):
     permit_to_project = db.session.execute("SELECT id FROM project_association WHERE project_id='{}' AND user_id='{}'".format(project_id, user_id)).fetchone()[0]
     if permit_to_project:
       task_explained = db.session.execute("SELECT taskname,body,timestamp FROM task WHERE id='{}'".format(task_id))
-      # all_comments = db.session.execute("SELECT c.id,c.user_id,c.timestamp,c.text,u.nickname FROM comment c, user u WHERE c.task_id='{}' AND u.id='{}'".format(task_id))
       all_comments = db.session.execute("SELECT id,user_id,timestamp,text FROM comment c WHERE task_id='{}'".format(task_id)).fetchall()
       all_comments = convert_id_to_nick(all_comments)
     else:
       return "Access to this task is denied for you"
 
-    #all_comments = db.session.query(Comment).filter_by(task_id=task_id).all()
     app.logger.debug('### End viewing ###')
     # may be need redirect to internal func here
     return render_template('task_view.html', title=u'Задачи', user=nickname,
@@ -212,6 +210,14 @@ def task(action='list'):
                 'depth':parent_depth+1 })
       db.session.commit()
       return redirect(url_for('task'))
+
+  ### Delete task
+  elif action=='delete':
+    task_to_delete = request.args.get('id')
+    db.session.execute("DELETE FROM task WHERE id={}".format(task_to_delete))
+    db.session.commit()
+    app.logger.info("### DELETING TASK ###\nTask to delete: "+str(task_to_delete))
+    return redirect(url_for('task'))
 
   return 'Unresolved error 2 in task'
 
@@ -342,10 +348,10 @@ def project(action='list'):
         user_ids.append(user_id[0])
 
       project_user_ids = user_ids
-      app.logger.debug('### Project # Edit ### id from form: '+str(project_id[0])+'\n'+ \
-                        'Name: '+str(project_name[0])+'\n'+ \
-                        'User IDs: '+str(project_user_ids)+'\n'+ \
-                        'Users in project: '+str(type(project_user_names)) ) # debug
+      # app.logger.debug('### Project # Edit ### id from form: '+str(project_id[0])+'\n'+ \
+      #                   'Name: '+str(project_name[0])+'\n'+ \
+      #                   'User IDs: '+str(project_user_ids)+'\n'+ \
+      #                   'Users in project: '+str(project_user_names) ) # debug
       project_full_data = [project_id, project_name[0], project_user_ids, project_user_names]
       return render_template('project_edit.html', title=u'Проекты', user=get_nick(), project=project_full_data)
 
