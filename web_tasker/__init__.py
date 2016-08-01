@@ -28,6 +28,10 @@ app = create_app('config_db.py')
 ## prepare database
 from web_tasker.models import db
 db.init_app(app)
+with app.app_context():
+        # Extensions like Flask-SQLAlchemy now know what the "current" app
+        # is while within this block. Therefore, you can now run........
+        db.create_all()
 
 # run url handler after all prepare code
 import web_tasker.views
