@@ -9,9 +9,8 @@ pip install -r requirements.txt
 # Run application server
 python ./runserver.py
 
+# python ./db_create.py
+#python ./show_python_modules.py
+
 # Get back old schema
 # python ./db_downgrade.py
-
-#python ./show_python_modules.py
-#python ./db_create.py
-
