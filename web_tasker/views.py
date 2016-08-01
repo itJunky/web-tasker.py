@@ -8,7 +8,7 @@ from datetime import datetime
 
 import logging
 
-from web_tasker import app, db
+from web_tasker import app
 from web_tasker.models import *
 
 @app.route("/")
@@ -474,7 +474,9 @@ def register_user():
                       request.form.get('email')+'\n'+
                       pass_hash+'\n') # debug
       db.session.add(user_row)
-      db.session.commit()
+      try:
+        db.session.commit()
+      except IntegrityError: return "Try another e-mail."
 
       # Getting id of new user for project owner
       user_id = db.session.query(User.id).filter_by(email=request.form.get('email')).all()[0][0]
