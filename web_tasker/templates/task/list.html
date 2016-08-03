@@ -9,9 +9,9 @@
         <h1>Выполненные задачи для {{ user }}</h1>
       {% endif %}
     </div>
-    {% include "localmenu.html" %}
-    {% include "menu.html" %}
-    {% include "taskmenu.html" %}
+    {% include "menu/local.html" %}
+    {% include "menu/main.html" %}
+    {% include "menu/task.html" %}
   </div> {# id="header" #}
   <div id='content' class="container panel-group">
     <table class="tasklist table table-striped table-hover table-condense">
