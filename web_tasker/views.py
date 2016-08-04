@@ -8,7 +8,7 @@ from datetime import datetime
 
 import logging
 
-from web_tasker import app, db
+from web_tasker import app
 from web_tasker.models import *
 
 @app.route("/")
