@@ -28,13 +28,13 @@
               <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu3">
                 <li role="presentation">
                   <a role="menuitem" tabindex="-1" href="#"
-                    onClick="document.getElementById('tstatus').value='Active'">
+                    onClick="document.getElementById('tstatus').value='Active';document.getElementById('dropdownMenu1').innerHTML='State: active'">
                     Active task
                   </a>
                 </li>
                 <li role="presentation">
                   <a role="menuitem" tabindex="-1" href="#"
-                    onClick="document.getElementById('tstatus').value='Disabled'">
+                    onClick="document.getElementById('tstatus').value='Disabled';document.getElementById('dropdownMenu1').innerHTML='State: disabled'">
                     Disable task
                   </a>
                 </li>
