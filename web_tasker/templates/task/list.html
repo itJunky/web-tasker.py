@@ -9,21 +9,21 @@
         <h1>Выполненные задачи для {{ user }}</h1>
       {% endif %}
     </div>
-    {% include "localmenu.html" %}
-    {% include "menu.html" %}
-    {% include "taskmenu.html" %}
+    {% include "menu/local.html" %}
+    {% include "menu/main.html" %}
+    {% include "menu/task.html" %}
   </div> {# id="header" #}
   <div id='content' class="container panel-group">
     <table class="tasklist table table-striped table-hover table-condense">
       <tr>
-        <td><div class="panel-heading"><strong>№</strong></div></td>
+        <td><div class="panel-heading pull-right"><strong>№</strong></div></td>
         <td><div class="panel-heading"><strong>Имя</strong></div></td>
         <td><div class="panel-heading"><strong>Время</strong></div></td>
       </div>
       {% for task in task_list %}
       {# 0-id, 1-name, 2-date, 3-parent_id, 4 #}
       <tr>
-        <td><div class="tasklistelement panel-body">{{ task[0] }} <!-- {{ task[3] }} --></div></td>
+        <td><div class="tasklistelement panel-body pull-right">{{ task[0] }} <!-- {{ task[3] }} --></div></td>
         <td><div class="tasklistelement panel-body">
           {% for i in range(task[4]) %}
             {% if loop.first %}

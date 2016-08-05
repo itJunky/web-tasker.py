@@ -14,10 +14,19 @@ def create_app(config_filename):
   bootstrap = Bootstrap()
   bootstrap.init_app(app)
 
+  #app.register_blueprint(app)
+ 
+  ## prepare database
+  from web_tasker.models import db
+  db.init_app(app)
+
+  with app.app_context():
+    db.create_all()
+
   # show startup flask variables
-  from pprint import pprint
-  items = app.config.viewitems()
-  for i in items: pass
+  #from pprint import pprint
+  #items = app.config.viewitems()
+  #for i in items: pass
       # print(i)
 
   return app

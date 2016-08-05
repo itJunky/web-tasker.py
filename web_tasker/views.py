@@ -72,7 +72,7 @@ def task(action='list'):
                                 WHERE status!='Disabled' \
                                   AND project_id='{}'".format(project_id))
       max_depth = cur.fetchone()[0]
-      if max_depth is None: return render_template('task.html', title=u'Задачи', user=get_nick(), task_list=[], task_status=task_status)
+      if max_depth is None: return render_template('task/list.html', title=u'Задачи', user=get_nick(), task_list=[], task_status=task_status)
       app.logger.debug('Max depth:\t'+str(max_depth)) # debug
       tasks = []
       # Get named list from db query
@@ -94,7 +94,7 @@ def task(action='list'):
       app.logger.debug('Tasks is:\n'+str(tasks)) # debug
 
     tasks = remove_microseconds(tasks)
-    return render_template('task.html', title=u'Задачи', user=get_nick(), task_list=tasks, task_status=task_status)
+    return render_template('task/list.html', title=u'Задачи', user=get_nick(), task_list=tasks, task_status=task_status)
 
   ### Creating task
   elif action=='create':
@@ -130,7 +130,7 @@ def task(action='list'):
       db.session.add(task_row)
       db.session.commit()
       return redirect(url_for('task', action='list', project_id=project_id))
-    return render_template('task_create.html', title=u'Задачи', user=get_nick(), parent=parent_id)
+    return render_template('task/create.html', title=u'Задачи', user=get_nick(), parent=parent_id)
 
   ### Explain task 
   elif action=='view':
@@ -165,7 +165,7 @@ def task(action='list'):
 
     app.logger.debug('### End viewing ###')
     # may be need redirect to internal func here
-    return render_template('task_view.html', title=u'Задачи', user=nickname,
+    return render_template('task/view.html', title=u'Задачи', user=nickname,
                             task_expl=task_explained.fetchone(), task_opened=task_id,
                             comments=all_comments)
 
@@ -182,9 +182,9 @@ def task(action='list'):
         cur = db.session.execute("SELECT taskname,body,timestamp,status,parent_id \
                                   FROM task \
                                   WHERE id='{}' AND user_id='{}'".format(task_edited, user_id))
-        return render_template('task_modify.html', title=u'Задачи', user=nickname, task_edited=task_edited, task_expl=cur.fetchone())
+        return render_template('task/edit.html', title=u'Задачи', user=nickname, task_edited=task_edited, task_expl=cur.fetchone())
       except TypeError: pass
-      return render_template('task_modify.html', title=u'Задачи', user=nickname, task_edited=task_edited)
+      return render_template('task/edit.html', title=u'Задачи', user=nickname, task_edited=task_edited)
     elif request.method == 'POST':
       try:
         cur = db.session.execute("SELECT id FROM user WHERE nickname='{}'".format(nickname))
@@ -249,7 +249,6 @@ def project(action='list'):
     app.logger.error('Not logined') # debug
     return redirect(url_for('do_login')) # if not logined go to login
 
-
   ### Show Project List ###
   if action == 'list' or action == 'list_closed':
     if action == 'list_closed':
@@ -275,7 +274,7 @@ def project(action='list'):
         project_users.append(project_user_names)
 
         # app.logger.debug('project_users is: '+str(project_user_names)) # debug
-    return render_template('project.html', title=u'Проекты', user=get_nick(), project_list=projects, project_status=project_status, project_users=project_users)
+    return render_template('project/list.html', title=u'Проекты', user=get_nick(), project_list=projects, project_status=project_status, project_users=project_users)
 
   ### Create new Project ###
   elif action == 'create':
@@ -295,12 +294,12 @@ def project(action='list'):
       return redirect(url_for('project')) # got to project list
 
     else: # if GET request
-      return render_template('project_create.html', title=u'Проекты', user=get_nick(), user_id=user_id)
+      return render_template('project/create.html', title=u'Проекты', user=get_nick(), user_id=user_id)
 
   ### View Project ###
   elif action == 'view':
     project_id = str(request.args.get('id'))
-    app.logger.debug('Project ID for view: '+str(project_id)) # debug
+    app.logger.debug('### Setting cookie ###\nProject ID for view: '+str(project_id)) # debug
     response = app.make_response(redirect(url_for('task', action='list', project_id=project_id)))
     response.set_cookie('project_id', value=project_id)
     return response # go to task list with cookie 'project_id' set
@@ -353,7 +352,7 @@ def project(action='list'):
       #                   'User IDs: '+str(project_user_ids)+'\n'+ \
       #                   'Users in project: '+str(project_user_names) ) # debug
       project_full_data = [project_id, project_name[0], project_user_ids, project_user_names]
-      return render_template('project_edit.html', title=u'Проекты', user=get_nick(), project=project_full_data)
+      return render_template('project/edit.html', title=u'Проекты', user=get_nick(), project=project_full_data)
 
   ### Remove user from Project
   elif action == 'rmuser':
@@ -363,6 +362,10 @@ def project(action='list'):
     db.session.commit()
     app.logger.debug("### Trying to delete user: "+str(userid_to_del)+"\nFrom project: "+project_id+"\n"+str(cur))
     return redirect(url_for('project', action='edit', id=project_id))
+
+###########################
+#### Another locations ####
+###########################
 
 @app.route("/profile")
 def profile():
@@ -524,7 +527,8 @@ def users_list():
   return render_template('user_list.html', user=get_nick(), user_list=user_list)
 
 #############################################
-
+### Functions ###
+#################
 def get_user_id():
   if logined_by_cookie():
     # refactoring

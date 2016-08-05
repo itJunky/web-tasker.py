@@ -1,0 +1,58 @@
+
+    {% extends "head.html" %}
+    {% block content %}
+  
+    <div class="page-header">
+      <h1>Изменение задачи №{{ task_edited }}</h1>
+    </div>
+    {% include "menu/main.html" %}
+    {% include "menu/local.html" %}
+    {% include "menu/task.html" %} 
+  </div> {# id="header" #}
+  <div id="content" class="container page-header">
+    {% if task_expl %}
+	    <form action="" method="post"><div class="form-group">
+	    <table class="table">
+	      <input type="hidden" name="taskid" value="{{ task_edited }}" />
+	      <tr><td>Время</td><td>{{ task_expl[2] }}</td><td></td><td></td></tr>
+	      <tr><td>Название</td><td colspan="3"><input class="form-control well-sm" type='text' name="taskname" value="{{ task_expl[0] }}"></tr>
+	      <tr>
+          <td>Статус</td>
+          <td>
+            <input type='hidden' name="taskstatus" id="tstatus" value="{{ task_expl[3] }}">
+            <div class="dropdown">
+              <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown">
+                {{ task_expl[3] }}
+                <span class="caret"></span>
+              </button>
+              <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu3">
+                <li role="presentation">
+                  <a role="menuitem" tabindex="-1" href="#"
+                    onClick="document.getElementById('tstatus').value='Active'">
+                    Active task
+                  </a>
+                </li>
+                <li role="presentation">
+                  <a role="menuitem" tabindex="-1" href="#"
+                    onClick="document.getElementById('tstatus').value='Disabled'">
+                    Disable task
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </td>
+          <td>Родитель</td>
+          <td>
+            <input class="form-control well-sm" type='text' name="taskparent" value="{{ task_expl[4] }}">
+          </td>
+          </td>
+        </tr>
+	      <tr><td>Текст</td><td colspan="3"><textarea class="form-control well-lg" type='text' name="taskbody">{{ task_expl[1] }}</textarea></td></tr>
+	      <tr><td colspan="4"><input class="btn btn-primary btn-block" type='submit' value='Изменить'></td><td></td><td></td></tr>
+	    </table>
+	    </div></form>
+    {% else %}
+    	Пусто
+    {% endif %}
+  </div>
+{% endblock %}

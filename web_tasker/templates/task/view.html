@@ -5,9 +5,9 @@
     <div class="page-header">
       <h1>Задача: {{ task_expl[0] }}</h1>
     </div>
-    {% include "localmenu.html" %}
-    {% include "menu.html" %}
-    {% include "taskmenu.html" %} 
+    {% include "menu/local.html" %}
+    {% include "menu/main.html" %}
+    {% include "menu/task.html" %} 
   </div> {# id="header" #}
   <div id='content' class="container">
     <table class="tasklist table">
@@ -40,7 +40,7 @@
         <tr>
           <td width="7%">Текст</td>
           <td>
-            <textarea class="form-control well-lg" type='text' name="commenttext">Коммент</textarea>
+            <textarea class="form-control well-lg" type='text' name="commenttext" placeholder="Комментарий"></textarea>
           </td>
         </tr>
         <tr>
