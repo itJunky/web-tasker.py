@@ -352,9 +352,11 @@ def project(action='list'):
       #                   'User IDs: '+str(project_user_ids)+'\n'+ \
       #                   'Users in project: '+str(project_user_names) ) # debug
       project_full_data = [project_id, project_name[0], project_user_ids, project_user_names]
-      return render_template('project/edit.html', title=u'Проекты', user=get_nick(), project=project_full_data)
+      response = app.make_response(render_template('project/edit.html', title=u'Проекты', user=get_nick(), project=project_full_data))
+      response.set_cookie('project_id', value=project_id)
+      return response # go to project editor with cookie 'project_id' set
 
-  ### Remove user from Project
+  ### Remove user from Project ###
   elif action == 'rmuser':
     project_id = str(request.cookies.get('project_id'))
     userid_to_del = str(request.args.get('id'))
