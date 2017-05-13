@@ -164,3 +164,82 @@ h1 {
 body {
     margin-top: -20px;
 }
+
+
+.user_list, .tasklist {
+	word-break: break-word;
+}
+
+@media screen and (max-width: 480px) {
+	#local-title {
+        font-size: 28px
+    }
+
+    .user_list {
+    	width: 300px;
+    }
+}
+
+@media screen and (max-width: 767px) {
+	#header {
+		padding-bottom: 110px;
+	}
+
+	.navbar-nav {
+	background-color: #222;
+    border-color: #080808;
+	}
+
+	.mainmenubar {
+		left: 60%;
+		width: 125px;
+	}
+
+	.taskmenu {
+		margin-top: 140px;
+		width: 94%;
+	}
+
+	.navbar-brand {
+		padding-left: 35px;
+	}
+
+	.taskmenu-elem {
+		background-color: #fff;
+	}
+
+	.taskmenu-elem > li {
+		background-color: #ccc;
+		margin: auto;
+	}
+
+	.tasklist {
+		margin-left: 0;
+	}
+
+	.login_form {
+	    margin-left: 0;
+	    width: 90%;
+	    margin: auto;
+	}
+
+	.task-container {
+		padding-top: 130px;
+	}
+}
+
+
+
+@media screen and (max-width: 1500px) {
+    #footer {
+        float: none;
+        width: 100%;
+        left: 0;
+        margin-top:  30px;
+    }
+
+    .navbar-header {
+    	margin-right: 0;
+    	margin-left: -25px;
+    }
+}
