@@ -170,6 +170,10 @@ body {
 	word-break: break-word;
 }
 
+.task-title {
+	padding-left: 40px;
+}
+
 @media screen and (max-width: 480px) {
 	#local-title {
         font-size: 28px
