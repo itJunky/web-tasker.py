@@ -31,11 +31,11 @@
       </div>
 
     {% block scripts %}
-      <script src="{{url_for('.static', filename='handler.js')}}"></script>
       <!-- <script src="{{bootstrap_find_resource('jquery.js', cdn='jquery')}}"></script> -->
       <script src="{{url_for('.static', filename='third/jquery.min.js')}}"></script>
       <!-- <script src="{{bootstrap_find_resource('js/bootstrap.js', cdn='bootstrap')}}"></script> -->
       <script src="{{url_for('.static', filename='third/bootstrap.min.js')}}"></script>
+      <script src="{{url_for('.static', filename='handler.js')}}"></script>
     {%- endblock scripts %}
     {%- endblock body %}
   </body>
