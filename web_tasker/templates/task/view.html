@@ -7,7 +7,7 @@
     </div>
     {% include "menu/local.html" %}
     {% include "menu/main.html" %}
-    {% include "menu/task.html" %} 
+    {% include "menu/task.html" %}
   </div> {# id="header" #}
   <div id='content' class="container">
     <table class="tasklist table">
@@ -28,7 +28,7 @@
       <hr class="style-two"> {# form section #}
       </div>
     {% endif %}
-    
+
     <form action="/comment_to_task" method="post"><div class="form-group">
       <table class="tasklist table">
         <input type="hidden" name="taskid" value="{{ task_opened }}" />
@@ -40,7 +40,10 @@
         <tr>
           <td width="7%">Текст</td>
           <td>
-            <textarea class="form-control well-lg" type='text' name="commenttext" placeholder="Комментарий"></textarea>
+            <div>
+              <textarea class="form-control well-lg" type='text' name="commenttext" placeholder="Комментарий"></textarea>
+              <span class="help-block invisible">Пожалуйста введите комментарий, не менее 6 символов</span>
+            </div>
           </td>
         </tr>
         <tr>
