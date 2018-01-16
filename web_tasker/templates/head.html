@@ -14,6 +14,10 @@
         <!-- Bootstrap -->
         <!-- <link href="{{bootstrap_find_resource('css/bootstrap.css', cdn='bootstrap')}}" rel="stylesheet"> -->
         <link rel="stylesheet" href="{{url_for('.static', filename='third/bootstrap.min.css')}}">
+
+        <!-- bootstrap-table -->
+        <link rel="stylesheet" href="{{url_for('.static', filename='third/bootstrap-table.min.css')}}">
+
         <link rel="stylesheet" href="{{url_for('.static', filename='mystyle.css')}}">
       {%- endblock styles %}
     {%- endblock head %}
@@ -35,6 +39,10 @@
       <script src="{{url_for('.static', filename='third/jquery.min.js')}}"></script>
       <!-- <script src="{{bootstrap_find_resource('js/bootstrap.js', cdn='bootstrap')}}"></script> -->
       <script src="{{url_for('.static', filename='third/bootstrap.min.js')}}"></script>
+
+      <!-- bootstrap-table.js -->
+      <script src="{{url_for('.static', filename='third/bootstrap-table.min.js')}}"></script>
+
       <script src="{{url_for('.static', filename='handler.js')}}"></script>
     {%- endblock scripts %}
     {%- endblock body %}

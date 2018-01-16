@@ -1,4 +1,4 @@
-<nav class="taskmenu nav navbar">  
+<nav class="taskmenu nav navbar">
   <div class="navbar-header">
     <label class="navbar-brand task-title">Проекты</label>
   </div>
@@ -7,6 +7,7 @@
       {% if project_opened %}
       {# если внутри задачи #}
         <li><a href='/project/edit?id={{ project_opened }}'>Изменить проект</a></li>
+        <li><a href='/project/delete'>Удалить проект</a></li>
       {% else %}
         {% if project_status == True %}
           <li><a href='/project/list_closed'>Завершённые</a></li>
@@ -14,6 +15,5 @@
           <li><a href='/project'>Открытые</a></li>
         {% endif  %}
       {% endif %}
-    <li><a href='/project/delete'>Удалить проект</a></li>
   </ul>
 </nav>

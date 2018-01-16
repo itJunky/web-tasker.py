@@ -1,12 +1,12 @@
 
     {% extends "head.html" %}
     {% block content %}
-  
+
     <div class="page-header">
       {% if task_status == True %}
-        <h1>Задачи для {{ user }}</h1>
+        <h1>Задачи для {{ user }} (открытые)</h1>
       {% else %}
-        <h1>Выполненные задачи для {{ user }}</h1>
+        <h1>Задачи для {{ user }} (все)</h1>
       {% endif %}
     </div>
     {% include "menu/local.html" %}
@@ -14,28 +14,55 @@
     {% include "menu/task.html" %}
   </div> {# id="header" #}
   <div id='content' class="container panel-group">
-    <table class="tasklist table table-striped table-hover table-condense">
+    <table
+      id="task-list"
+      class="tasklist table table-striped table-hover table-condense invisible faded"
+      data-sort-name="timestamp"
+      data-sort-order="asc"
+      data-classes="table-no-bordered">
+      <thead>
       <tr>
-        <td><div class="panel-heading pull-right"><strong>№</strong></div></td>
-        <td><div class="panel-heading"><strong>Имя</strong></div></td>
-        <td><div class="panel-heading"><strong>Время</strong></div></td>
-      </div>
-      {% for task in task_list %}
-      {# 0-id, 1-name, 2-date, 3-parent_id, 4 #}
-      <tr>
-        <td><div class="tasklistelement panel-body pull-right">{{ task[0] }} <!-- {{ task[3] }} --></div></td>
-        <td><div class="tasklistelement panel-body">
-          {% for i in range(task[4]) %}
-            {% if loop.first %}
-              &#8627;&nbsp;
-            {% else %}
-              &#8640;&nbsp;
-            {% endif %}
-          {% endfor %}
-          <a href="/task/view?id={{ task[0] }}">{{ task[1] }}</a></div></td>
-        <td style="width: 10%; white-space: nowrap"><div class="tasklistelement panel-body jumbotron">{{ task[2] }}</div></td>
+        <th data-field="id" data-align="center" data-sortable="false"><div class="panel-heading pull-right"><strong>№</strong></div></th>
+        <th data-field="parent_id" data-visible="false"><div class="panel-heading pull-right"><strong>parent_id</strong></div></th>
+        <th data-field="taskname"><div class="panel-heading"><strong>Имя</strong></div></th>
+        <th data-field="timestamp" data-sortable="true"><div class="panel-heading"><strong>Время</strong></div></th>
+        <th data-field="timestamp_seconds" data-visible="false"><div class="panel-heading"><strong>Время в секундах</strong></div></th>
+        <th data-field="status" data-visible="false"><div class="panel-heading pull-right"><strong>status</strong></div></th>
+        <th data-field="depth" data-visible="false"><div class="panel-heading pull-right"><strong>depth</strong></div></th>
       </tr>
-      {% endfor %}
+      </thead>
+      <tbody>
+        {% for task in task_list %}
+        {# 0-id, 1-name, 2-date, 3-parent_id, 4-depth #}
+          <tr>
+            <td>{{ task.id }}</td>
+            <td>{{ task.parent_id }}</td>
+            <td>
+              {% for i in range(task.depth) %}
+                {% if loop.first %}
+                  &#8627;&nbsp;
+                {% else %}
+                  &#8640;&nbsp;
+                {% endif %}
+              {% endfor %}
+              <a href="{{url_for('task', action='view', id=task.id)}}">
+                {% if task.status=='Disabled' %}
+                  <del class="text-muted">{{ task.taskname }}</del>
+                {% else %}
+                  {{ task.taskname }}
+                {% endif %}
+              </a>
+                {% if task.status=='Disabled' %}
+                  <span class="label label-default pull-right">завершено</span>
+                {% endif %}
+            </td>
+            <td style="width: 10%; white-space: nowrap">{{ task.timestamp | format_timestamp }}</td>
+            <td>{{ task.timestamp.strftime('%s') }}</td>
+            <td>{{ task.status }}</td>
+            <td>{{ task.depth }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
     </table>
   </div>
 {% endblock %}
