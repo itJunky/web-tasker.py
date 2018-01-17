@@ -1,3 +1,11 @@
+h1 {
+    text-align: center;
+}
+
+body {
+    margin-top: -20px;
+}
+
 .mainmenubar {
     width: 140px;
     background: #ddd;
@@ -22,12 +30,6 @@
 }
 
 .mycontent {
-    /*width: auto;
-    background: #bbb;
-    padding: 5px;
-    padding-right: 20px; 
-    float: center;
-    margin: 10px;*/
     border: solid 1px black;
     min-height: 20%;
 }
@@ -63,8 +65,36 @@
 
 .tasklist {
     width: 94%;
-    margin-left: 4%;
+    opacity: 1;
+    transition: opacity 0.5s ease;
 }
+
+.tasklist.faded {
+    opacity: 0;
+}
+
+.tasklist td.td-title {
+    width: 7%;
+}
+
+.tasklist td.td-content {
+    overflow: scroll;
+    max-width: 0;
+}
+
+.tasklist td.td-content pre {
+    white-space: pre-line;
+    word-break: break-all;
+}
+
+/* task list (bootstrap table col width) */
+#task-list td { min-width: 0; }
+/* id col */
+#task-list td:nth-child(1){ min-width: 7%; }
+/* taskname col*/
+#task-list td:nth-child(2){ max-width: 100%; }
+/* timestamp col */
+#task-list td:nth-child(3){ min-width: 23%; }
 
 .tasklistelement {
     margin-top: -20px;
@@ -96,16 +126,14 @@
 }
 
 #footer {
-    width: auto; 
-    background: #fc0; 
+    width: auto;
+    background: #fc0;
     clear: both;
     padding: 5px;
     border: solid 1px black;
     float: right;
     position: relative;
-    /*top: 40px; */
     left: -70px;
-    /*margin-top: -3em; */
     z-index: 20;
 }
 
@@ -120,10 +148,6 @@
     background: #ccd;
     margin-top: -5%;
     float: center;
-   /* padding: 5px;
-    padding-right: 20px; 
-    border: solid 1px black; 
-    margin: 10px; */
 }
 .register_form, .login_form {
     width: 20%;
@@ -135,7 +159,6 @@
     padding: 5px;
     padding-right: 20px;
     border: solid 1px black;
-    /*float: center; */
     margin: auto;
 }
 
@@ -157,79 +180,79 @@
     box-shadow: inset 0 -12px 12px -12px rgba(0, 0, 0, 0.5);
 }
 
-h1 {
-    text-align: center;
-}
-
-body {
-    margin-top: -20px;
-}
 
 
 .user_list, .tasklist {
-	word-break: break-word;
+    word-break: break-word;
 }
 
 .task-title {
-	padding-left: 40px;
+    padding-left: 40px;
+}
+
+/*
+    BootstrapTable Custom Styles
+*/
+.fixed-table-container thead th .sortable {
+    background-position: left;
 }
 
 @media screen and (max-width: 480px) {
-	#local-title {
+    #local-title {
         font-size: 28px
     }
 
     .user_list {
-    	width: 300px;
+        width: 300px;
     }
+
 }
 
 @media screen and (max-width: 767px) {
-	#header {
-		padding-bottom: 110px;
-	}
+    #header {
+        padding-bottom: 110px;
+    }
 
-	.navbar-nav {
-	background-color: #222;
-   	border-color: #080808;
-	}
+    .navbar-nav {
+        background-color: #222;
+        border-color: #080808;
+    }
 
-	.mainmenubar {
-		left: 60%;
-		width: 125px;
-	}
+    .mainmenubar {
+        left: 60%;
+        width: 125px;
+    }
 
-	.taskmenu {
-		margin-top: 140px;
-		width: 94%;
-	}
+    .taskmenu {
+        margin-top: 140px;
+    }
 
-	.navbar-brand {
-		padding-left: 35px;
-	}
+    .navbar-brand {
+        padding-left: 35px;
+    }
 
-	.taskmenu-elem {
-		background-color: #fff;
-	}
+    .taskmenu-elem {
+        background-color: #fff;
+    }
 
-	.taskmenu-elem > li {
-		background-color: #ccc;
-		margin: auto;
-	}
+    .taskmenu-elem > li {
+        background-color: #ccc;
+    }
 
-	.tasklist {
-		margin-left: 0;
-	}
+    .tasklist {
+        margin-left: 0;
+    }
 
-	.login_form {
-	    margin-left: 0;
-	    width: 90%;
-	    margin: auto;
-	}
+    .register_form,
+    .login_form {
+        margin-left: 0;
+        width: 90%;
+        margin: auto;
+    }
 
-	.task-container {
-		padding-top: 130px;
-	}
+    .task-container {
+        padding-top: 130px;
+    }
 }
 
 
@@ -243,7 +266,7 @@ body {
     }
 
     .navbar-header {
-    	margin-right: 0;
-    	margin-left: -25px;
+        margin-right: 0;
+        margin-left: -25px;
     }
 }

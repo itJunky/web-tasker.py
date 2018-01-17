@@ -8,12 +8,11 @@
     {% include "menu/local.html" %}
     {% include "menu/main.html" %}
     {% include "menu/task.html" %}
-  </div> {# id="header" #}
   <div id='content' class="container">
     <table class="tasklist table">
       <tr><td>Время</td><td>{{ task_expl[2] }}</td></tr>
-      <tr><td>Имя</td><td><div class="well well-sm">{{ task_expl[0] }}</div></td></td></tr>
-      <tr><td>Текст</td><td><pre class="well-lg">{{ task_expl[1] }}</pre></td></tr>
+      <tr><td>Имя</td><td><div class="well well-sm">{{ task_expl[0] }}</div></td></tr>
+      <tr><td class="td-title">Текст</td><td class="td-content"><pre class="well-lg">{{ task_expl[1] }}</pre></td></tr>
     </table>
     {% if comments %}
       <div align="center" class="comments-section">
@@ -21,8 +20,8 @@
       {% for comment in comments %}
         <table class="tasklist table">
           <tr><td>Время</td><td>{{ comment[2] }}</td></tr>
-          <tr><td>Имя</td><td>{{ comment[4] }}</td></td></tr>
-          <tr><td>Текст</td><td><pre class="well-lg">{{ comment[3] }}</pre></td></tr>
+          <tr><td>Имя</td><td>{{ comment[4] }}</td></tr>
+          <tr><td class="td-title">Текст</td><td class="td-content"><pre class="well-lg">{{ comment[3] }}</pre></td></tr>
         </table>
       {% endfor %}
       <hr class="style-two"> {# form section #}
@@ -30,15 +29,15 @@
     {% endif %}
 
     <form action="/comment_to_task" method="post"><div class="form-group">
+      <input type="hidden" name="taskid" value="{{ task_opened }}">
       <table class="tasklist table">
-        <input type="hidden" name="taskid" value="{{ task_opened }}" />
         <tr class="well">
           <td colspan=2>
-            <p align="center"><b>Комментировать</b> или создать <a href="/task/create?taskparent={{ task_opened }}">Подзадачу</p>
+            <p align="center"><b>Комментировать</b> или создать <a href="/task/create?taskparent={{ task_opened }}">Подзадачу</a></p>
           </td>
         </tr>
         <tr>
-          <td width="7%">Текст</td>
+          <td class="td-title">Текст</td>
           <td>
             <div>
               <textarea class="form-control well-lg" type='text' name="commenttext" placeholder="Комментарий"></textarea>

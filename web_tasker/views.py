@@ -2,7 +2,7 @@
 
 from flask import Flask, render_template, request, send_from_directory, request, make_response, session, redirect, url_for
 # for custom HTTP statuses
-#from flask.ext.api import status 
+#from flask.ext.api import status
 HTTP_403_FORBIDDEN = 403
 from datetime import datetime
 
@@ -21,7 +21,7 @@ def index():
   else:
     user=get_user_id()
 
-  return render_template('index.html', title='Hi', user_from=user_from, user=user) 
+  return render_template('index.html', title='Hi', user_from=user_from, user=user)
 
 ###########################
 ########## TASK ###########
@@ -32,6 +32,7 @@ def task(action='list'):
   try:
     user_id = get_user_id()
     app.logger.info('Some task viewing by user:\t'+str(user_id)) # debug
+    if user_id == None: return redirect(url_for('do_login')) # if not logined go to login
   except:
     app.logger.error('Not logined') # debug
     return redirect(url_for('do_login')) # if not logined go to login
@@ -59,41 +60,17 @@ def task(action='list'):
       check_up = db.session.query(Project_association.id).filter_by(project_id=project_id, user_id=user_id).one()
     except: return "Wrong project ID"
 
-    # rewrite to sqlalchemy like User.query.all() or User.query.filter() like in edit section
-    # http://flask.pocoo.org/docs/0.10/patterns/sqlalchemy/
-    if action == 'list_closed':
+    tasks = []
+    if action == 'list_closed': # show all tasks
       task_status = False # for taskmenu
-      cur = db.session.execute("SELECT id, taskname, timestamp, parent_id, depth FROM task WHERE status='Disabled' AND depth=0 AND user_id='{}' AND project_id='{}'".format(user_id, project_id))
-    else: # Show opened tasks
+      tasks = Task.query.filter(Task.user_id==user_id, Task.project_id==project_id).all()
+
+    else: # Show opened tasks only
       task_status = True # for taskmenu
-      # Get deepest depth
-      cur = db.session.execute("SELECT MAX(depth) \
-                                FROM task \
-                                WHERE status!='Disabled' \
-                                  AND project_id='{}'".format(project_id))
-      max_depth = cur.fetchone()[0]
-      if max_depth is None: return render_template('task/list.html', title=u'Задачи', user=get_nick(), task_list=[], task_status=task_status)
-      app.logger.debug('Max depth:\t'+str(max_depth)) # debug
-      tasks = []
-      # Get named list from db query
-      for depth in xrange(0,max_depth+1):
-        cur = db.session.execute("SELECT id, taskname, timestamp, parent_id, depth \
-                                  FROM task \
-                                  WHERE status!='Disabled' \
-                                    AND depth='{}' \
-                                    AND project_id='{}'".format(depth, project_id))
-        tasks_tmp = cur.fetchall()
-        for t in tasks_tmp:
-          tasks.append(t)
+      tasks = Task.query.filter(Task.user_id==user_id, Task.project_id==project_id).filter(Task.status=='Active').all()
 
-    #tasks = cur.fetchall() 
-
-      # sort by tree
-      sorted_list = []
-      tasks = QuickSort(tasks, 0, sorted_list)
-      app.logger.debug('Tasks is:\n'+str(tasks)) # debug
-
-    tasks = remove_microseconds(tasks)
+    app.logger.debug('Tasks is:\n'+str(tasks)) # debug
+    # tasks = order_tasks(tasks, 0, [])
     return render_template('task/list.html', title=u'Задачи', user=get_nick(), task_list=tasks, task_status=task_status)
 
   ### Creating task
@@ -103,9 +80,9 @@ def task(action='list'):
     if parent_id is None:
       parent_id = request.form['taskparent']
       app.logger.info('PARENT TASK ID from form:\t'+str(parent_id)) # debug
-      if parent_id is None: 
+      if parent_id is None:
         parent_id = 0
-        app.logger.info('PARENT TASK ID is ZERO:\t'+str(parent_id)) # debug     
+        app.logger.info('PARENT TASK ID is ZERO:\t'+str(parent_id)) # debug
 
     if request.method == 'POST':
       # Getting user id
@@ -132,11 +109,11 @@ def task(action='list'):
       return redirect(url_for('task', action='list', project_id=project_id))
     return render_template('task/create.html', title=u'Задачи', user=get_nick(), parent=parent_id)
 
-  ### Explain task 
+  ### Explain task
   elif action=='view':
     task_id = request.args.get('id')
     app.logger.debug('### Start viewing task id: {} ###'.format(task_id))
-    
+
     try:
       nickname = get_nick()
     except:
@@ -258,19 +235,18 @@ def project(action='list'):
       project_status = True
       project_ids = get_projects_for_user(user_id, 'Active')
 
-    # app.logger.debug('project_ids: '+str(project_ids)) # debug
+    #app.logger.debug('project_ids: '+str(project_ids)) # debug
+    projects = []
+    project_users = []
     if project_ids:
-      projects = []
-      project_users = []
       for project_id in project_ids:
         project_name = db.session.query(Project.name).filter_by(id=project_id[0]).all()[0]
         projects.append([project_id[0], project_name[0]])
         project_user_ids = db.session.query(Project_association.user_id).filter_by(project_id=project_id[0]).all()
         project_user_names = []
         for user_id in project_user_ids:
-          name = db.session.query(User.nickname).filter_by(id=user_id[0]).all()[0]
-          project_user_names.append(name[0])
-
+          name = db.session.query(User.nickname).filter_by(id=user_id[0]).one_or_none()
+          if name: project_user_names.append(name[0])
         project_users.append(project_user_names)
 
         # app.logger.debug('project_users is: '+str(project_user_names)) # debug
@@ -286,7 +262,7 @@ def project(action='list'):
       #       Project ID
       project_name = request.form.get('projectname')
 
-      db.session.add(Project(name=project_name))
+      db.session.add(Project(name=project_name, status='Active', owner=user_id))
       db.session.commit()
       project_id = db.session.query(Project.id).filter_by(name=project_name)
       db.session.add(Project_association(user_id=user_id, project_id=project_id[0][0]))
@@ -342,8 +318,8 @@ def project(action='list'):
       project_user_names = []
       user_ids = []
       for user_id in project_user_ids:
-        name = db.session.query(User.nickname).filter_by(id=user_id[0]).all()[0]
-        project_user_names.append(name[0])
+        name = db.session.query(User.nickname).filter_by(id=user_id[0]).one_or_none()
+        if name: project_user_names.append(name[0])
         user_ids.append(user_id[0])
 
       project_user_ids = user_ids
@@ -375,7 +351,7 @@ def profile():
     return redirect(url_for('do_login')) # if not logined go to login
   else:
     username = get_nick()
-    user_id = request.cookies.get('id') 
+    user_id = request.cookies.get('id')
     email = db.session.query(User.email).filter_by(id=user_id).one()[0]
     return render_template('profile.html', user=username, mail=email, user_id=user_id)
 
@@ -427,14 +403,14 @@ def do_login():
       password = str(request.form['password'])
     except UnicodeEncodeError:
       return "Wrong login or password charset"
-    
+
     #app.logger.info('Check password:\t'+str(check_passwd(user, password))) # debug
     if check_passwd(user, password):
       # Set Cookies for knowing about user on other pages
       auth_hash = str(id_generator())
       user_id = int(get_user_id_from_db(user))
       app.logger.debug('Set cookies '+str(user)+' '+str(user_id)+' '+auth_hash) # debug
-      
+
       response = app.make_response(redirect(url_for('index')))
       response.set_cookie('id', value=str(user_id))
       response.set_cookie('hash', value=auth_hash)
@@ -469,7 +445,7 @@ def register_user():
       salt = '$6$FIXEDS'
       pass_hash = crypt.crypt(request.form.get('password'), salt)
       user_row = User(nickname=request.form.get('username'),
-                      email=request.form.get('email'), 
+                      email=request.form.get('email'),
                       password=request.form.get('password'),
                       p_hash=pass_hash,
                       role=ROLE_USER,
@@ -583,7 +559,7 @@ def logined_by_cookie():
 
       if str(cookie) == str(user_hash):
         return True # yeah LOGINED
-    
+
   return False
 
 def get_nick():
@@ -613,11 +589,14 @@ def get_hash_from_db(username):
 def get_projects_for_user(user_id, status='Active'):
   if status == 'Disabled':
     project_status = False
-    cur = db.session.execute("SELECT id FROM project WHERE status='Disabled' and value='{}'".format(user_id))
-    project_ids = cur.fetchall()[0]
   else:
     project_status = True
-    project_ids = db.session.query(Project_association.project_id).filter_by(user_id=user_id).all()
+
+  project_ids = db.session.query(Project_association.project_id)\
+    .join(Project, Project.id==Project_association.project_id)\
+    .filter(Project.status==status)\
+    .filter(Project_association.user_id==user_id)\
+    .all()
 
   return project_ids
 
@@ -641,16 +620,24 @@ def QuickSort(lst, parent_id, sorteded):
 
   return sorted_list
 
-def remove_microseconds(tasks):
-  tasks_short_date = []
-  for task in tasks:
-    tasks_short_date.append([task['id'],
-                             task['name'],
-                             task['date'].split(".")[0],
-                             task['parent'],
-                             task['depth']])
-
   tasks = tasks_short_date
   # for task in tasks:
   #   app.logger.debug('Task preview:\t'+str(task)) # debug
   return tasks
+
+def order_tasks(tasks, parent_id, partially_sorted):
+  sorted_tasks = partially_sorted
+  for task in tasks:
+    if task.parent_id == parent_id:
+      sorted_tasks.append(task)
+      order_tasks(tasks, task.id, sorted_tasks)
+
+  return sorted_tasks
+
+
+####################################
+######### TEMPLATE FILTERS #########
+####################################
+@app.template_filter('format_timestamp')
+def format_timestamp(timestamp):
+  return str(timestamp).split(".")[0]
