@@ -88,7 +88,11 @@ body {
 }
 
 /* task list (bootstrap table col width) */
-#task-list td { min-width: 0; }
+#task-list td {
+    min-width: 0;
+    padding-top: 2px;
+    padding-bottom: 2px;
+}
 /* id col */
 #task-list td:nth-child(1){ min-width: 7%; }
 /* taskname col*/
