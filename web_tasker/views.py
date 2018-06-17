@@ -198,19 +198,37 @@ def task(action='list'):
 
   return 'Unresolved error 2 in task'
 
-@app.route("/comment_to_task", methods=['POST'])
+@app.route("/comment_to_task", methods=['GET', 'POST'])
 def post_comment_to_task():
-  user_id = get_user_id()
-  task_id = request.form['taskid']
-  text = request.form.get('commenttext')
-  new_comment = Comment(user_id=user_id, task_id=task_id, timestamp=datetime.now(), text=text)
-  app.logger.info('### Post Comment to db ###\n'+
-                  'For user: '+str(user_id)+' and Task ID: '+task_id+'\n'+
-                  'With text: '+text+'\n'+
-                  'Resulted request: '+str(new_comment)) # debug
-  db.session.add(new_comment)
-  db.session.commit()
-  return redirect(url_for('task', action='view', id=int(request.form['taskid'])))
+  if request.method == 'GET':
+    user_id = get_user_id()
+    if user_id == None: return redirect(url_for('do_login')) # if not logined go to login
+    comment_id = request.args.get('id')
+    what_to_do = request.args.get('do')
+    if what_to_do == 'delete':
+      author_id = get_comment_author_id(comment_id)
+      if author_id == user_id:
+        res = "USER_ID: %s\nCOMMENT_ID: %s\nAUTHOR_ID: %s\nWhat_To_Do: %s"%(user_id, comment_id, author_id, what_to_do)
+        print(res)
+        cur = db.session.query(Comment).filter_by(id=comment_id).delete()
+        db.session.commit()
+        return redirect(url_for('task', action='view', id=int(request.args.get('tid'))))
+      else:
+        return "You can delete comment only if you is it author."
+
+  if request.method == 'POST':
+    user_id = get_user_id()
+    task_id = request.form['taskid']
+    text = request.form.get('commenttext')
+    new_comment = Comment(user_id=user_id, task_id=task_id, timestamp=datetime.now(), text=text)
+    app.logger.info('### Post Comment to db ###\n'+
+                    'For user: '+str(user_id)+' and Task ID: '+task_id+'\n'+
+                    'With text: '+text+'\n'+
+                    'Resulted request: '+str(new_comment)) # debug
+    db.session.add(new_comment)
+    db.session.commit()
+    return redirect(url_for('task', action='view', id=int(request.form['taskid'])))
+
 
 ###########################
 ######### PROJECT #########
@@ -599,7 +617,7 @@ def get_projects_for_user(user_id, status='Active'):
 
 def get_first_project_id(user_id):
   p = get_projects_for_user(user_id)[0][0]
-  app.logger.debug("Projects for this user: "+str(p))
+  app.logger.debug("First Project ID for this user: "+str(p))
   return p
 
 import string
@@ -631,6 +649,11 @@ def order_tasks(tasks, parent_id, partially_sorted):
 
   return sorted_tasks
 
+def get_comment_author_id(comment_id):
+  #user_id = db.session.query(Comment.user_id).filter_by(id=comment_id).one_or_none()
+  user_id = db.session.query(Comment.user_id).filter_by(id=comment_id).one_or_none()[0]
+  print("RAW comment user ID: %s FOR COMMENT ID: %s"%(user_id, comment_id))
+  return user_id
 
 ####################################
 ######### TEMPLATE FILTERS #########

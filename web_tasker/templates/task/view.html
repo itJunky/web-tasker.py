@@ -19,9 +19,19 @@
       <hr class="style-one"> {# comments section #}
       {% for comment in comments %}
         <table class="tasklist table">
-          <tr><td>Время</td><td>{{ comment[2] }}</td></tr>
-          <tr><td>Имя</td><td>{{ comment[4] }}</td></tr>
-          <tr><td class="td-title">Текст</td><td class="td-content"><pre class="well-lg">{{ comment[3] }}</pre></td></tr>
+          <tr>
+            <td>Время</td>
+            <td>{{ comment[2] }}</td>
+            <td align="right">
+              <a href="#">Edit</a> 
+              <a href="/comment_to_task?id={{ comment[0] }}&tid={{ task_opened }}&do=delete">Delete</a>
+            </td>
+          </tr>
+          <tr><td>Имя</td><td colspan=2>{{ comment[4] }}</td></tr>
+          <tr>
+            <td class="td-title">Текст</td>
+            <td class="td-content" colspan=2><pre class="well-lg">{{ comment[3] }}</pre></td>
+          </tr>
         </table>
       {% endfor %}
       <hr class="style-two"> {# form section #}
@@ -47,7 +57,7 @@
         </tr>
         <tr>
           <td colspan=2>
-            <input class="btn btn-primary btn-block" type='submit' value='Добавть Комментарий'>
+            <input class="btn btn-primary btn-block" type='submit' value='Добавить Комментарий'>
           </td>
         </tr>
       </table>
