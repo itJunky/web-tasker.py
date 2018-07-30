@@ -58,7 +58,8 @@ def task(action='list'):
 
         # Check access to project
         try:
-            check_up = db.session.query(ProjectAssociation.id).filter_by(project_id=project_id, user_id=user_id).one()
+            check_up = db.session.query(ProjectAssociation.id).\
+                filter_by(project_id=project_id, user_id=user_id).one()
         except:
             return "Wrong project ID"
 
@@ -72,10 +73,13 @@ def task(action='list'):
             tasks = Task.query.filter(Task.user_id == user_id, Task.project_id == project_id).filter(
                 Task.status == 'Active').all()
 
+        # Get project name
+        project_name = db.session.query(Project.name).filter_by(id=project_id).one()[0]
+
         app.logger.debug('Tasks is:\n' + str(tasks))  # debug
         # tasks = order_tasks(tasks, 0, [])
         return render_template('task/list.html', title=u'Задачи', user=get_nick(), task_list=tasks,
-                               task_status=task_status)
+                               task_status=task_status, project_name=project_name)
 
     ### Creating task
     elif action == 'create':
