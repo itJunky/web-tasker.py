@@ -18,13 +18,13 @@
       <div align="center" class="comments-section">
       <hr class="style-one"> {# comments section #}
       {% for comment in comments %}
-        <table class="tasklist table">
+        <table class="tasklist table" data-data='{ "commentid": {{ comment[0] }}, "taskid": {{ task_opened }} }'>
           <tr>
             <td>Время</td>
             <td>{{ comment[2] }}</td>
             <td align="right">
-              <a href="#">Edit</a> 
-              <a href="/comment_to_task?id={{ comment[0] }}&tid={{ task_opened }}&do=delete">Delete</a>
+              <a class="js-edit-comment-button btn btn-default btn-xs" href="#">Edit</a>
+              <a href="/comment_to_task?id={{ comment[0] }}&tid={{ task_opened }}&do=delete" class="js-delete-comment-button btn btn-danger btn-xs">Delete</a>
             </td>
           </tr>
           <tr><td>Имя</td><td colspan=2>{{ comment[4] }}</td></tr>
