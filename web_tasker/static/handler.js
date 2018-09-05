@@ -220,8 +220,8 @@ $(document).ready(function () {
           // *** All you need is just specify endpoint and HTTP METHOD ***
           // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-          $.ajax('/test_endpoint', {
-            method: 'PUT',
+          $.ajax('/edit_comment_to_task', {
+            method: 'POST',
             data: data
           });
 

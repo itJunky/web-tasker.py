@@ -138,12 +138,7 @@ def task(action='list'):
             app.logger.debug("Login is wrong")
             return redirect(url_for('do_login'))
 
-        # check access to current project
-        project_id = db.session.execute("SELECT project_id FROM task WHERE id='{}'".format(task_id)).fetchone()[0]
-        permit_to_project = db.session.execute(
-            "SELECT id FROM project_association WHERE project_id='{}' AND user_id='{}'".format(project_id,
-                                                                                               user_id)).fetchone()[0]
-        if permit_to_project:
+        if permit_to_project(user_id, task_id):
             task_explained = db.session.execute(
                 "SELECT taskname,body,timestamp FROM task WHERE id='{}'".format(task_id))
             all_comments = db.session.execute(
@@ -246,6 +241,28 @@ def post_comment_to_task():
         db.session.add(new_comment)
         db.session.commit()
         return redirect(url_for('task', action='view', id=int(request.form['taskid'])))
+
+
+@app.route("/edit_comment_to_task", methods=['POST'])
+def edit_comment_to_task():
+    user_id = get_user_id()
+    if user_id is None:
+        return redirect(url_for('do_login'))
+
+    # ['commenttext', 'oldcommenttext', 'taskid', 'commentid']
+    # app.logger.info(request.form.keys())
+    task_id = request.form.get('taskid')
+    comment_id = request.form.get('commentid')
+    comment_text = request.form.get('commenttext')
+    if can_user_edit_in_this_task_comment(user_id, task_id, comment_id):
+        # db.session.query().\
+        #     filter(Comment.id == comment_id).\
+        #     update({"text": comment_text})
+        Comment.query.filter_by(id = comment_id).update({"text": comment_text})
+        db.session.commit()
+        return 'Ok'
+
+    return 'Not Ok' # redirect(url_for('task', action='view', id=int(request.args.get('tid'))))
 
 
 ###########################
@@ -704,6 +721,29 @@ def get_comment_author_id(comment_id):
     user_id = db.session.query(Comment.user_id).filter_by(id=comment_id).one_or_none()[0]
     print("RAW comment user ID: %s FOR COMMENT ID: %s" % (user_id, comment_id))
     return user_id
+
+
+def can_user_edit_in_this_task_comment(user_id, task_id, comment_id):
+    # Check access to task
+    if permit_to_project(user_id, task_id):
+        # Check owner of comment
+        comment_owner = db.session.query(Comment.user_id).filter_by(id=comment_id).one_or_none()[0]
+        # app.logger.info(comment_owner)
+        if user_id == comment_owner:
+            return True
+        else:
+            return False
+
+
+def permit_to_project(user_id, task_id):
+    # check access to current project
+    project_id = db.session.execute("SELECT project_id FROM task WHERE id='{}'".format(task_id)).fetchone()[0]
+    permit_to_project = db.session.execute(
+        "SELECT id FROM project_association WHERE project_id='{}' AND user_id='{}'".format(project_id,
+                                                                                           user_id)).fetchone()[0]
+    if permit_to_project: return True
+    else: return False
+
 
 
 ####################################
