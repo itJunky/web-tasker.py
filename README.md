@@ -9,6 +9,18 @@ You can try it on my hosting here http://tasker.itjunky.ws
 For run on development environment you need a docker
 Than you need to go into web-tasker.py directory and run ```docker-compose up```
 
+## Requirements
+
+```apt install python3-pip```
+
+```pip install --upgrade pip```
+
+```pip install -r requirements.txt```
+
+
+
+## Run application
+
 If it's your first run, you need to edit *init.sh* for uncomment a line
 
 ```python ./db_create.py```
