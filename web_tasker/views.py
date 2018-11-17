@@ -70,7 +70,7 @@ def task(action='list'):
 
         else:  # Show opened tasks only
             task_status = True  # for taskmenu
-            tasks = Task.query.filter(Task.user_id == user_id, Task.project_id == project_id).filter(
+            tasks = Task.query.filter(Task.project_id == project_id).filter(
                 Task.status == 'Active').all()
 
         # Get project name
@@ -526,7 +526,9 @@ def register_user():
             db.session.add(user_row)
             try:
                 db.session.commit()
-            except IntegrityError:
+            # except IntegrityError:
+            except Exception as e:
+                print(e)
                 return "Try another e-mail."
 
             # Getting id of new user for project owner
