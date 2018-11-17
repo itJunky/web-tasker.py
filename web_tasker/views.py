@@ -7,9 +7,11 @@ from datetime import datetime
 from web_tasker import app
 from web_tasker.models import db, User, Task, ProjectAssociation, Comment, Project, ROLE_USER
 
+# TODO document it like `sed 's/RSH/rnd_str/g'`
+SECRET = 'RANDOM_SYMBOLS_HERE'
+
 # for custom HTTP statuses
 HTTP_403_FORBIDDEN = 403
-
 
 @app.route("/")
 def index():
@@ -511,7 +513,7 @@ def register_user():
         else:
             # Prepare user data to insert in db
             import crypt
-            salt = '$6$FIXEDS'
+            salt = '$6$' + SECRET
             pass_hash = crypt.crypt(request.form.get('password'), salt)
             user_row = User(nickname=request.form.get('username'),
                             email=request.form.get('email'),
