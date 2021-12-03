@@ -4,7 +4,7 @@
 
 ![alt tag](https://raw.githubusercontent.com/itJunky/web-tasker.py/master/current_screenshot/web-tasker-py-0-1.png)
 
-You can try it on my hosting here http://tasker.itjunky.ws
+You can try it on my hosting here https://tasker.ro0o.tk
 
 For run on development environment you need a docker
 Than you need to go into web-tasker.py directory and run ```docker-compose up```
