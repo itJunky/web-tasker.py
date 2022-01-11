@@ -6,19 +6,25 @@
     <div>
       <ul class="nav navbar-nav">
         {% if user %}
-          <li {%- if request.path == "/profile" %} class="active" {% endif %}>
+          <li {%- if request.path == "/project" %} class="active" {% endif %}>
       	    <a href="/project">Проекты</a>
       	  </li>
           <li {%- if request.path == "/task" %} class="active" {% endif %}>
       	    <a href="/task">Задачи</a>
       	  </li>
-          <li><a href="/users">Пользователи</a></li>
+          <li {%- if request.path == "/users" %} class="active" {% endif %}>
+            <a href="/users">Пользователи</a>
+          </li>
           <li class="mainmenuline"><a href="/groups">Группы</a></li>
-          <li><a href="/profile"><strong>{{ user }}</strong></a></li>
+          <li {%- if request.path == "/profile" %} class="active" {% endif %}>
+            <a href="/profile"><strong>{{ user }}</strong></a>
+          </li>
           <li><a href="/logout">Выйти</a></li>
         {% else %}
           <li><a href="/login">Войти</a></li>
-          <li><a href="/register">Зарегистрироваться</a></li>
+          <li {%- if request.path == "/register" %} class="active" {% endif %}>
+            <a href="/register">Зарегистрироваться</a>
+          </li>
         {% endif %}
         <li class="mainmenuline"><a href="/about">О нас</a></li>
       </ul>
