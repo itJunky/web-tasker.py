@@ -2,11 +2,12 @@
 {% extends "head.html" %}
 {% block content %}
   
-  <div class="page-header">
-    <h1>Создание проекта для {{ user }}</h1>
-  </div>
-  {% include "menu/main.html" %}
-  {% include "menu/local.html" %}
+    {% include "menu/global.html" %}
+    {% include "menu/projectmenu.html" %}
+    <div class="page-header">
+      <h1>Создание проекта для {{ user }}</h1>
+    </div>
+  </div> {# id="header" #}
   <div class="container well-lg">
     <form action="" method="post">
     <table class="table">

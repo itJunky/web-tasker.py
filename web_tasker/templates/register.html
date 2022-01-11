@@ -1,14 +1,13 @@
  
-    {% extends "head.html" %}
-    {% block content %}
+{% extends "head.html" %}
+{% block content %}
 
+    {% include "menu/global.html" %}
     <div class="page-header">
       <h1>Пройдите не сложную регистрацию</h1>
     </div>
-    {% include "menu/local.html" %}
-    {% include "menu/main.html" %}
   </div> {# id="header" #}
-  <div id="content" class="container well-lg register_form">
+  <div id="content" class="container well-lg register_form mycontent">
     <form role="form" action="" method="post">
       <label for="login">Логин:</label><input class="form-control well-sm" type="text" name="username">
       <div class="form-group">

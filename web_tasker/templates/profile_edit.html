@@ -1,12 +1,12 @@
 
-    {% extends "head.html" %}
-    {% block content %}
-      
-    <div class="page-header">
-      <h1>Личная карточка {{ user }}</h1>
-    </div>
-      {% include "menu/local.html" %}
-      {% include "menu/main.html" %}
+{% extends "head.html" %}
+{% block content %}
+
+      {% include "menu/global.html" %}
+      <div class="page-header">
+        <h1>Личная карточка {{ user }}</h1>
+      </div>
+
     </div> {# id="header" #}
     <div id="content" class="well-sm container panel-group index">
       <form action="" method="post"><div class="form-group">

@@ -1,14 +1,15 @@
 
-    {% extends "head.html" %}
-    {% block content %}
+{% extends "head.html" %}
+{% block content %}
 
+    {% include "menu/global.html" %}
     <div class="page-header">
-      <h1>Добро пожаловать</h1>
+        <h1>Добро пожаловать</h1>
     </div>
-    {% include "menu/local.html" %}
-    {% include "menu/main.html" %} 
   </div> {# id="header" #}
-  <div id="content" class="index mycontent well-sm">
-      После регистрации Вы сможете создать свой проект и вести в нём список и ход решения задач.
+  <div id="content" class="index mycontent well-lg">
+      После регистрации и логина Вы сможете создавать свой список задач и удобнее управлять своим временем. <br/><br/>
+      Задачи можно объединять в проекты. Проектами можно делиться проектом с друзьями, совместно решая поставленные задачи. <br/><br/>
+      Если Вас заинтересовал проект и Вы готовы помочь в разработке или дизайне, напишите в гитхаб автору.<br/>
   </div>
 {% endblock %}
