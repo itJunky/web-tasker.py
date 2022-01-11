@@ -1,43 +1,44 @@
 
-    {% extends "head.html" %}
-    {% block content %}
+{% extends "head.html" %}
+{% block content %}
 
-    <div class="page-header">
-      <h1>Редактирование проекта № {{ project[0] }}</h1>
+        {% include "menu/global.html" %}
+        {% include "menu/projectmenu.html" %}
+        <div class="page-header">
+            <h1>Редактирование проекта № {{ project[0] }}</h1>
+        </div>
+    </div> {# id="header" #}
+    <div id="content" class="container well-lg">
+        {% if project %}
+          <form action="" method="post">
+            <table class="table">
+                <input type="hidden" name="project_id" value="{{ project[0] }}" />
+                <tr><td style="width: 25%">Имя проекта</td><td><input class="form-control" required type='text' name='projectname' value="{{ project[1] }}"></td></tr>
+                <tr>
+                  <td>Список пользователей</td>
+                  <td>
+                    <ul class="list-inline">
+                      {% for user in project[3] %}
+                        <li>
+                          <div class="well well-sm">
+                            <a href='/project/rmuser?id={{ project[2][loop.index-1] }}' alt='Удалить пользователя'>-</a>
+                            {{ user }}
+                          </div>
+                        </li>
+                      {% endfor %}
+                      <br>
+                      <input type="checkbox" id="adduser" name="addusertoggle" value="1">Добавить пользователя в проект</input>
+                      <div id="dinamic-form" style="display: none; width: 20%;">
+                        <input class="form-control" type="text" name="adduser">
+                      </div><br>
+                    </ul>
+                  </td>
+                </tr>
+                <tr><td colspan="2"><input class="btn btn-primary btn-block" type='submit' value='Отправить'></td></tr>
+            </table>
+          </form>
+        {% else %}
+          Пусто
+        {% endif %}
     </div>
-    {% include "menu/main.html" %}
-    {% include "menu/local.html" %}
-  </div> {# id="header" #}
-  <div id="content" class="container well-lg">
-    {% if project %}
-      <form action="" method="post">
-      <table class="table">
-        <input type="hidden" name="project_id" value="{{ project[0] }}" />
-        <tr><td style="width: 25%">Имя проекта</td><td><input class="form-control" required type='text' name='projectname' value="{{ project[1] }}"></td></tr>
-        <tr>
-          <td>Список пользователей</td>
-          <td>
-            <ul class="list-inline">
-              {% for user in project[3] %}
-                <li>
-                  <div class="well well-sm">
-                    <a href='/project/rmuser?id={{ project[2][loop.index-1] }}' alt='Удалить пользователя'>-</a>
-                    {{ user }}
-                  </div>
-                </li>
-              {% endfor %}
-              <br>
-              <input type="checkbox" id="adduser" name="addusertoggle" value="1">Добавить пользователя в проект</input>
-              <div id="dinamic-form" style="display: none; width: 20%;">
-                <input class="form-control" type="text" name="adduser">
-              </div><br>
-            </ul>
-          </td>
-        </tr>
-        <tr><td colspan="2"><input class="btn btn-primary btn-block" type='submit' value='Отправить'></td></tr>
-      </table>
-      </form>
-    {% else %}
-      Пусто
-    {% endif %}
 {% endblock %}

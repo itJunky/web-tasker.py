@@ -1,32 +1,32 @@
 
-    {% extends "head.html" %}
-    {% block content %}
+{% extends "head.html" %}
+{% block content %}
   
+    {% include "menu/global.html" %}
+    {% include "menu/projectmenu.html" %}
     <div class="page-header">
-      {% if project_status == True %}
-        <h1>Открытые проекты для {{ user }}</h1>
-      {% else %}
-        <h1>Выполненные проекты для {{ user }}</h1>
-      {% endif %}
+        {% if project_status == True %}
+             <h1>Открытые проекты для {{ user }}</h1>
+        {% else %}
+             <h1>Выполненные проекты для {{ user }}</h1>
+        {% endif %}
     </div>
-    {% include "menu/local.html" %}
-    {% include "menu/main.html" %}
-    {% include "projectmenu.html" %}
   </div> {# id="header" #}
+
   <div id='content' class="container panel-group">
-    <table class="tasklist table table-striped table-hover table-condense">
+    <table class="table table-dark table-striped table-hover table-condense tasklist" >
       <tr>
         <td><div class="panel-heading"><strong>№</strong></div></td>
         <td><div class="panel-heading"><strong>Имя</strong></div></td>
         <td><div class="panel-heading"><strong>Пользователи</strong></div></td>
         <td></td>
-      </div>
+
       {% for project in project_list %}
       <tr>
         <td><div class="tasklistelement panel-body">{{ project[0] }}</div></td>
-        <td><div class="tasklistelement panel-body"><a href="/project/view?id={{ project[0] }}">{{ project[1] }}</a></td>
+          <td><div class="tasklistelement panel-body"><a href="/project/view?id={{ project[0] }}">{{ project[1] }}</a></div></td>
         <td>
-          <div class="tasklistelement panel-body jumbotron">
+          <div class="tasklistelement panel-body">
             {% for name in project_users[loop.index-1] %}
               {{ name }}
             {% endfor %}
@@ -35,4 +35,5 @@
       </tr>
       {% endfor %}
     </table>
+  </div>
 {% endblock %}

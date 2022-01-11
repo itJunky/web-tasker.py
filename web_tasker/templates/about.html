@@ -1,10 +1,15 @@
 
 {% extends "head.html" %}
+{% block content %}
 
-  {% include "menu/main.html" %}
-  <div class="page-header ">
-  	<h1>Немного о себе</h1>
+    {% include "menu/global.html" %}
+    <div class="page-header ">
+      <h1>Немного о себе</h1>
+    </div>
+  </div> {# id="header" #}
+  <div class="index mycontent well-lg" id="content">
+    Это сайт для сохранения подробностей о ходе решения задач. </br>
+    Разрабатывается в режиме открытого кода.</br>
+    Всегда рады вашим коммитам.</br>
   </div>
-  <div class="about">
-    Это сайт для сохранения подробностей о ходе решения задач.
-  </div>
+{% endblock %}

@@ -1,18 +1,18 @@
 
-    {% extends "head.html" %}
-    {% block content %}
+{% extends "head.html" %}
+{% block content %}
 
+    {% include "menu/global.html" %}
+    {% include "menu/task.html" %}
     <div class="page-header">
       <h1>Задача: {{ task_expl[0] }}</h1>
     </div>
-    {% include "menu/local.html" %}
-    {% include "menu/main.html" %}
-    {% include "menu/task.html" %}
+  </div> {# id="header" #}
   <div id='content' class="container">
     <table class="tasklist table">
       <tr><td>Время</td><td>{{ task_expl[2] }}</td></tr>
       <tr><td>Имя</td><td><div class="well well-sm">{{ task_expl[0] }}</div></td></tr>
-      <tr><td class="td-title">Текст</td><td class="td-content"><pre class="well-lg">{{ task_expl[1] }}</pre></td></tr>
+      <tr><td class="td-title">Текст</td><td class="td-content"><pre class="well well-lg">{{ task_expl[1] }}</pre></td></tr>
     </table>
     {% if comments %}
       <div align="center" class="comments-section">
@@ -30,7 +30,7 @@
           <tr><td>Имя</td><td colspan=2>{{ comment[4] }}</td></tr>
           <tr>
             <td class="td-title">Текст</td>
-            <td class="td-content" colspan=2><pre class="well-lg">{{ comment[3] }}</pre></td>
+            <td class="td-content" colspan=2><pre class="well well-lg">{{ comment[3] }}</pre></td>
           </tr>
         </table>
       {% endfor %}
@@ -50,7 +50,7 @@
           <td class="td-title">Текст</td>
           <td>
             <div>
-              <textarea class="form-control well-lg" type='text' name="commenttext" placeholder="Комментарий"></textarea>
+              <textarea class="form-control well well-lg" type='text' name="commenttext" placeholder="Комментарий"></textarea>
               <span class="help-block invisible">Пожалуйста введите комментарий, не менее 6 символов</span>
             </div>
           </td>

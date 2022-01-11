@@ -1,14 +1,13 @@
    
-    {% extends "head.html" %}
-    {% block content %}
+{% extends "head.html" %}
+{% block content %}
 
+    {% include "menu/global.html" %}
     <div class="page-header">
-      <h1>Войдите или присоединитесь</h1>
+      <h1>Пожалуйста авторизуйтесь</h1>
     </div>
-    {% include "menu/local.html" %}
-    {% include "menu/main.html" %}
   </div> {# id="header" #}
-  <div class="container well-lg login_form">
+  <div class="container well-lg mycontent login_form">
     <form role="form" action="" method="post">
       <label for="login">Логин:</label><input class="form-control well-sm" type="text" name="username">
       <div class="form-group">
@@ -16,7 +15,7 @@
         <input class="form-control well-sm" type="password" name="password" id="pwd">
       </div>
       <div class="checkbox">
-        <label><input type="checkbox"> Remember me</label>
+        <label><input type="checkbox"> Запомнить меня</label>
       </div>
       <input class="btn btn-primary btn-block" type="submit" value='Войти'>
     </form>

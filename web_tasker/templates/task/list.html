@@ -1,7 +1,9 @@
 
-    {% extends "head.html" %}
-    {% block content %}
+{% extends "head.html" %}
+{% block content %}
 
+    {% include "menu/global.html" %}
+    {% include "menu/task.html" %}
     <div class="page-header">
       {% if task_status == True %}
         <h1>Задачи для {{ user }} (открытые)</h1>
@@ -9,27 +11,24 @@
         <h1>Задачи для {{ user }} (все)</h1>
       {% endif %}
     </div>
-    {% include "menu/local.html" %}
-    {% include "menu/main.html" %}
-    {% include "menu/task.html" %}
   </div> {# id="header" #}
 
   <div id='content' class="container panel-group">
     <table
       id="task-list"
-      class="tasklist table table-striped table-hover table-condense invisible faded"
+      class="tasklist table table-dark table-striped table-hover table-condense invisible faded"
       data-sort-name="timestamp"
       data-sort-order="asc"
       data-classes="table-no-bordered">
       <thead>
       <tr>
-        <th data-field="id" data-align="center" data-sortable="false"><div class="panel-heading pull-right"><strong>№</strong></div></th>
-        <th data-field="parent_id" data-visible="false"><div class="panel-heading pull-right"><strong>parent_id</strong></div></th>
-        <th data-field="taskname"><div class="panel-heading"><strong>Имя</strong></div></th>
-        <th data-field="timestamp" data-sortable="true"><div class="panel-heading"><strong>Время</strong></div></th>
-        <th data-field="timestamp_seconds" data-visible="false"><div class="panel-heading"><strong>Время в секундах</strong></div></th>
-        <th data-field="status" data-visible="false"><div class="panel-heading pull-right"><strong>status</strong></div></th>
-        <th data-field="depth" data-visible="false"><div class="panel-heading pull-right"><strong>depth</strong></div></th>
+        <th data-field="id" class="tasklist" data-align="center" data-sortable="false"><div class="panel-heading pull-right"><strong>№</strong></div></th>
+        <th data-field="parent_id" class="tasklist" data-visible="false"><div class="panel-heading pull-right"><strong>parent_id</strong></div></th>
+        <th data-field="taskname" class="tasklist"><div class="panel-heading"><strong>Имя</strong></div></th>
+        <th data-field="timestamp" class="tasklist" data-sortable="true"><div class="panel-heading"><strong>Время</strong></div></th>
+        <th data-field="timestamp_seconds" class="tasklist" data-visible="false"><div class="panel-heading"><strong>Время в секундах</strong></div></th>
+        <th data-field="status" class="tasklist" data-visible="false"><div class="panel-heading pull-right"><strong>status</strong></div></th>
+        <th data-field="depth" class="tasklist" data-visible="false"><div class="panel-heading pull-right"><strong>depth</strong></div></th>
       </tr>
       </thead>
       <tbody>
