@@ -652,7 +652,7 @@ def convert_id_to_nick(comments):
     result = list()
     app.logger.debug("### START Convert IDs to Nicks ###\nSource data:\n" + str(comments))  # debug
     for comment in comments:
-        nick = db.session.query("nickname FROM user WHERE id='{}'".format(comment[1])).first()[0]
+        nick = User.query.filter_by(id=comment[1]).first().nickname
         converted_comment = (comment[0], comment[1], comment[2], comment[3], nick)
         app.logger.debug("### Convert IDs to Nicks ###\n" + str(converted_comment) + "\n" + str(comment))  # debug
         result.append(converted_comment)
