@@ -6,10 +6,19 @@
     <div>
       <ul class="nav navbar-nav">
         {% if user %}
-          <li {%- if request.path == "/project" %} class="active" {% endif %}>
+          <li {%- if (request.path == "/project" or
+                      request.path == "/project/create" or
+                      request.path == "/project/edit") %}
+                          class="active"
+              {% endif %}>
       	    <a href="/project">Проекты</a>
       	  </li>
-          <li {%- if request.path == "/task" %} class="active" {% endif %}>
+          <li {%- if (request.path == "/task" or
+                      request.path == "/task/list" or
+                      request.path == "/task/view" or
+                      request.path == "/task/edit") %}
+                          class="active"
+              {% endif %}>
       	    <a href="/task">Задачи</a>
       	  </li>
           <li {%- if request.path == "/users" %} class="active" {% endif %}>
