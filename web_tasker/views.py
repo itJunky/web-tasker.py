@@ -370,8 +370,7 @@ def project(action='list'):
             #       Project Name
             #       Project Users
             project_name = db.session.query(Project.name).filter_by(id=project_id).all()[0]
-            project_user_ids = db.session.query(ProjectAssociation.user_id).filter_by(project_id=project_id).values(
-                'user_id')
+            project_user_ids = db.session.query(ProjectAssociation.user_id).filter_by(project_id=project_id)
 
             project_user_names = []
             user_ids = []
