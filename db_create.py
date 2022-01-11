@@ -2,7 +2,7 @@ from migrate.versioning import api
 from config_db import SQLALCHEMY_DATABASE_URI
 from config_db import SQLALCHEMY_MIGRATE_REPO
 from web_tasker import app
-from flask.ext.sqlalchemy import SQLAlchemy
+from flask_sqlalchemy import SQLAlchemy
 
 db = SQLAlchemy(app)
 
