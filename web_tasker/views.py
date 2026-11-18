@@ -670,8 +670,10 @@ def get_hash_from_db(username):
 def get_projects_for_user(user_id, status='Active'):
     if status == 'Disabled':
         project_status = False
-        cur = db.session.execute("SELECT id FROM project WHERE status='Disabled' and value='{}'".format(user_id))
-        project_ids = cur.fetchall()[0]
+        # projects with Disabled status associated to user
+        project_ids = db.session.query(ProjectAssociation.project_id).filter_by(
+            user_id=user_id
+        ).join(Project).filter(Project.status == 'Disabled').all()
     else:
         project_status = True
         project_ids = db.session.query(ProjectAssociation.project_id).filter_by(user_id=user_id).all()
