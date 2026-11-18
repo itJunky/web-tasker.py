@@ -6,6 +6,7 @@ from datetime import datetime
 
 from web_tasker import app
 from web_tasker.models import db, User, Task, ProjectAssociation, Comment, Project, ROLE_USER
+from sqlalchemy.exc import IntegrityError
 
 # for custom HTTP statuses
 HTTP_403_FORBIDDEN = 403
@@ -56,22 +57,19 @@ def task(action='list'):
                 app.logger.debug("!!! TRYING TO GET PROJECT ID !!!\nFirst from all: " + str(project_id))
                 project_id = get_first_project_id(user_id)
 
-        # Check access to project
-        try:
-            check_up = db.session.query(ProjectAssociation.id).\
-                filter_by(project_id=project_id, user_id=user_id).one()
-        except:
+        # Check access to project (by project association)
+        if not db.session.query(ProjectAssociation.id).\
+                filter_by(project_id=project_id, user_id=user_id).first():
             return "Wrong project ID"
 
         tasks = []
         if action == 'list_closed':  # show all tasks
             task_status = False  # for taskmenu
-            tasks = Task.query.filter(Task.user_id == user_id, Task.project_id == project_id).all()
+            tasks = Task.query.filter(Task.project_id == project_id).all()
 
         else:  # Show opened tasks only
             task_status = True  # for taskmenu
-            tasks = Task.query.filter(Task.user_id == user_id, Task.project_id == project_id).filter(
-                Task.status == 'Active').all()
+            tasks = Task.query.filter(Task.project_id == project_id, Task.status == 'Active').all()
 
         # Get project name
         project_name = db.session.query(Project.name).filter_by(id=project_id).one()[0]
@@ -153,7 +151,6 @@ def task(action='list'):
                                task_expl=task_explained.fetchone(), task_opened=task_id,
                                comments=all_comments)
 
-    ### Edit task
     elif action == 'edit':
         nickname = get_nick()
         if request.method == 'GET':
@@ -162,10 +159,13 @@ def task(action='list'):
             cur = db.session.execute("SELECT id FROM user WHERE nickname='{}'".format(nickname))
             try:
                 user_id = cur.fetchone()[0]
-                # Getting task by user and task id
+                # Check project access
+                if not permit_to_project(user_id, task_edited):
+                    return "Access denied"
+                # Getting task by task id (all members can edit)
                 cur = db.session.execute("SELECT taskname,body,timestamp,status,parent_id \
                                   FROM task \
-                                  WHERE id='{}' AND user_id='{}'".format(task_edited, user_id))
+                                  WHERE id='{}'".format(task_edited))
                 return render_template('task/edit.html', title=u'Задачи', user=nickname, task_edited=task_edited,
                                        task_expl=cur.fetchone())
             except TypeError:
